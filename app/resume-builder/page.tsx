@@ -11,6 +11,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { UserData } from '@/types/resume';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { SharedHeader } from '@/components/shared-header';
+import { Eye, X } from "lucide-react";
 
 const Resume = dynamic(
   () => import("@/components/resume").then((mod) => mod.Resume),
@@ -59,6 +60,56 @@ export default function LandingPage() {
     }
     return "default";
   });
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [mobileZoom, setMobileZoom] = useState(100);
+
+  // Calculate mobile zoom based on viewport
+  useEffect(() => {
+    if (!showMobilePreview || typeof window === "undefined") return;
+
+    const calculateMobileZoom = () => {
+      // A4 width in mm: 210mm, but resume uses 220mm
+      // Convert to pixels: 220mm ≈ 829px at 96dpi (1mm ≈ 3.779px)
+      const resumeWidthPx = 220 * 3.779; // ~831px
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const padding = 32; // 16px on each side
+      const headerHeight = 73; // Header + padding
+      
+      // Available width and height
+      const availableWidth = viewportWidth - padding;
+      const availableHeight = viewportHeight - headerHeight - padding;
+      
+      // Calculate zoom based on width (how much to scale down to fit)
+      const widthZoom = (availableWidth / resumeWidthPx) * 100;
+      
+      // Calculate zoom based on height (A4 height ≈ 297mm = 1122px)
+      const resumeHeightPx = 297 * 3.779; // ~1122px
+      const heightZoom = (availableHeight / resumeHeightPx) * 100;
+      
+      // Use the smaller zoom to fit both dimensions, but don't exceed 100%
+      const calculatedZoom = Math.min(widthZoom, heightZoom, 100);
+      
+      // Set zoom with a minimum of 25% and maximum of 100%
+      setMobileZoom(Math.max(Math.min(calculatedZoom, 100), 25));
+    };
+
+    // Calculate immediately and on resize
+    calculateMobileZoom();
+    
+    const handleResize = () => {
+      calculateMobileZoom();
+    };
+
+    window.addEventListener("resize", handleResize);
+    // Also recalculate after a short delay to ensure layout is settled
+    const timeoutId = setTimeout(calculateMobileZoom, 100);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, [showMobilePreview]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -113,8 +164,8 @@ export default function LandingPage() {
         {/* Navigation */}
         <SharedHeader variant="builder" />
 
-        {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
+        {/* Desktop Layout */}
+        <div className="hidden lg:flex flex-1 overflow-hidden">
           <PanelGroup direction="horizontal">
             <Panel defaultSize={60} minSize={50} className="print:!w-full">
               <div className="flex justify-center flex-col items-center h-full">
@@ -143,6 +194,66 @@ export default function LandingPage() {
               />
             </Panel>
           </PanelGroup>
+        </div>
+
+        {/* Mobile/Tablet Layout */}
+        <div className="lg:hidden flex flex-col flex-1 overflow-hidden">
+          {/* Mobile Preview Button */}
+          <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-white">
+            <h2 className="text-lg font-semibold text-gray-900">Resume Builder</h2>
+            <button
+              onClick={() => setShowMobilePreview(!showMobilePreview)}
+              className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-zinc-800 transition-colors text-sm font-medium"
+            >
+              <Eye className="w-4 h-4" />
+              {showMobilePreview ? "Hide Preview" : "Preview Resume"}
+            </button>
+          </div>
+
+          {/* Mobile Preview Modal */}
+          {showMobilePreview && (
+            <div className="fixed inset-0 z-50 bg-white flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white flex-shrink-0">
+                <h2 className="text-lg font-semibold text-gray-900">Resume Preview</h2>
+                <button
+                  onClick={() => setShowMobilePreview(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-auto bg-gray-50 flex items-start justify-center p-2 sm:p-4">
+                <div className="w-full flex items-center justify-center min-h-full py-4">
+                  <div className="bg-white shadow-lg w-full" style={{ maxWidth: '100%' }}>
+                    <Resume
+                      key={JSON.stringify(userData)}
+                      ref={resumeRef}
+                      template={template}
+                      githubId={githubId}
+                      config={config}
+                      userData={userData}
+                      zoom={mobileZoom}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Form Section */}
+          {!showMobilePreview && (
+            <div className="flex-1 overflow-hidden">
+              <ClientRightSidebar
+                config={config}
+                onConfigChange={handleConfigChange}
+                userData={userData}
+                onUserDataChange={handleUserDataChange}
+                zoom={zoom}
+                onZoomChange={setZoom}
+                isMobile={true}
+              />
+            </div>
+          )}
         </div>
       </div>
     </ErrorBoundary>

@@ -22,6 +22,7 @@ interface ClientRightSidebarProps {
   onLinkedInImport?: () => void;
   zoom: number;
   onZoomChange: (zoom: number) => void;
+  isMobile?: boolean;
 }
 
 export function ClientRightSidebar(props: ClientRightSidebarProps) {

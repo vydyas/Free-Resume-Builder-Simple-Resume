@@ -319,3 +319,4 @@ export function getAllTemplates(): EmailTemplate[] {
 export function getTemplate(id: EmailTemplateType): EmailTemplate | undefined {
   return emailTemplates[id];
 }
+

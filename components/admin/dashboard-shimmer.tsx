@@ -42,3 +42,4 @@ export function DashboardShimmer() {
     </div>
   );
 }
+

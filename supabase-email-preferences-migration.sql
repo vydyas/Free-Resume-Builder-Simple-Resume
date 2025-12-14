@@ -17,3 +17,4 @@ CREATE INDEX IF NOT EXISTS idx_users_email_subscription ON users(email_subscript
 COMMENT ON COLUMN users.email_subscription_enabled IS 'User email subscription preference. true = opted in, false = opted out';
 COMMENT ON COLUMN users.first_name IS 'User first name';
 COMMENT ON COLUMN users.last_name IS 'User last name';
+
