@@ -176,6 +176,25 @@ ol {
     display: none !important;
   }
 
+  /* Hide mobile preview modal header and controls */
+  .fixed.inset-0.z-50 > div:first-child,
+  button[aria-label*="close"],
+  button[aria-label*="Close"] {
+    display: none !important;
+  }
+
+  /* Show resume in mobile preview modal when printing */
+  .fixed.inset-0.z-50 {
+    position: static !important;
+    display: block !important;
+  }
+
+  .fixed.inset-0.z-50 > div:last-child {
+    display: block !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
   /* Reset any zoom transforms */
   [style*="transform"] {
     transform: none !important;

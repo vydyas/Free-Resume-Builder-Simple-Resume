@@ -105,6 +105,16 @@ export function RightSidebar({
   const [activeMobileTab, setActiveMobileTab] = useState("personal-info");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Create dynamic section items including custom sections
+  const allSectionItems = useMemo(() => {
+    const baseItems = [...SECTION_ITEMS];
+    const customItems = (userData.customSections || []).map((section) => ({
+      id: section.id,
+      label: section.title || `Custom Section ${section.id}`,
+    }));
+    return [...baseItems, ...customItems];
+  }, [userData.customSections]);
+
   // Create a memoized version of the debounce function
   const debouncedUpdate = useMemo(
     () => debounce((data: Partial<UserData>) => onUserDataChange(data), 300),
@@ -422,13 +432,15 @@ export function RightSidebar({
           <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
             <div className="overflow-x-auto scrollbar-hide">
               <div className="flex gap-2 px-4 py-3 min-w-max">
-                {SECTION_ITEMS.map((item) => (
+                {allSectionItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => {
                       setActiveMobileTab(item.id);
                       // Scroll to the section
-                      const element = document.querySelector(`[data-section="${item.id}"]`);
+                      // Try data-section first (works for both standard and custom sections)
+                      const element = document.querySelector(`[data-section="${item.id}"]`) || 
+                                     document.querySelector(`[value="${item.id}"]`);
                       if (element) {
                         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }
@@ -1157,6 +1169,7 @@ export function RightSidebar({
                 key={`custom-section-${index}`}
                 id={`custom-section-${index}`}
                 value={section.id}
+                data-section={section.id}
                 className="border rounded-lg group"
               >
                 <div className="flex items-center justify-between bg-muted px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -2051,6 +2064,7 @@ export function RightSidebar({
                 key={`custom-section-${index}`}
                 id={`custom-section-${index}`}
                 value={section.id}
+                data-section={section.id}
                 className="border rounded-lg group"
               >
                 <div className="flex items-center justify-between bg-muted px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -2257,7 +2271,31 @@ export function RightSidebar({
             </Button>
           )}
         </div>
-        {!isMobile && (
+        {isMobile ? (
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-20 shadow-lg">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <FloatingControls
+                  zoom={zoom}
+                  onZoomChange={onZoomChange}
+                />
+                <Button 
+                  onClick={handleAddCustomSection} 
+                  className="flex-1 bg-gradient-to-r from-purple-600/80 to-blue-500/80 text-white hover:text-white hover:from-purple-600 hover:to-blue-500 transition-all duration-300 shadow-sm hover:shadow-md"
+                  variant="ghost"
+                  size="sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-white/20 flex items-center justify-center">
+                      <Plus className="h-3 w-3" />
+                    </div>
+                    <span className="text-xs font-medium">Add Section</span>
+                  </div>
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
           <div className="flex justify-between p-4 border-t bg-background">
             <FloatingControls
               zoom={zoom}

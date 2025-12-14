@@ -63,6 +63,20 @@ export default function LandingPage() {
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [mobileZoom, setMobileZoom] = useState(100);
 
+  // Listen for print event to open mobile preview
+  useEffect(() => {
+    const handleOpenPreview = () => {
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+        setShowMobilePreview(true);
+      }
+    };
+
+    window.addEventListener('openMobilePreview', handleOpenPreview);
+    return () => {
+      window.removeEventListener('openMobilePreview', handleOpenPreview);
+    };
+  }, []);
+
   // Calculate mobile zoom based on viewport
   useEffect(() => {
     if (!showMobilePreview || typeof window === "undefined") return;
@@ -212,19 +226,20 @@ export default function LandingPage() {
 
           {/* Mobile Preview Modal */}
           {showMobilePreview && (
-            <div className="fixed inset-0 z-50 bg-white flex flex-col">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white flex-shrink-0">
+            <div className="fixed inset-0 z-50 bg-white flex flex-col print:static print:block">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white flex-shrink-0 print:hidden">
                 <h2 className="text-lg font-semibold text-gray-900">Resume Preview</h2>
                 <button
                   onClick={() => setShowMobilePreview(false)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Close preview"
                 >
                   <X className="w-5 h-5 text-gray-600" />
                 </button>
               </div>
-              <div className="flex-1 overflow-auto bg-gray-50 flex items-start justify-center p-2 sm:p-4">
-                <div className="w-full flex items-center justify-center min-h-full py-4">
-                  <div className="bg-white shadow-lg w-full" style={{ maxWidth: '100%' }}>
+              <div className="flex-1 overflow-auto bg-gray-50 flex items-start justify-center p-2 sm:p-4 print:overflow-visible print:p-0 print:bg-white">
+                <div className="w-full flex items-center justify-center min-h-full py-4 print:py-0">
+                  <div className="bg-white shadow-lg w-full print:shadow-none print:w-full" style={{ maxWidth: '100%' }}>
                     <Resume
                       key={JSON.stringify(userData)}
                       ref={resumeRef}

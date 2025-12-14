@@ -93,8 +93,30 @@ export function FloatingControls({
 
     try {
       trackEvents.resumePrinted();
-      await window.print();
-      fireConfetti();
+      
+      // On mobile, ensure resume is visible for printing
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+        // Check if we're in mobile preview mode
+        const mobilePreviewModal = document.querySelector('.fixed.inset-0.z-50');
+        if (!mobilePreviewModal) {
+          // Dispatch custom event to open mobile preview
+          const openPreviewEvent = new CustomEvent('openMobilePreview');
+          window.dispatchEvent(openPreviewEvent);
+          
+          // Wait for preview to open
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
+      
+      // Small delay to ensure DOM is ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      window.print();
+      
+      // Fire confetti after a short delay
+      setTimeout(() => {
+        fireConfetti();
+      }, 500);
     } catch (error) {
       console.error('Print failed:', error);
     }
@@ -115,23 +137,23 @@ export function FloatingControls({
           rounded-[24px]
           shadow-lg
           border border-[#7a3eea]
-          px-4 py-1
-          flex items-center gap-4
+          px-2 sm:px-4 py-1
+          flex items-center gap-2 sm:gap-4
           transition-all duration-300
         `}>
           {/* Zoom Controls */}
-          <div className="flex items-center gap-2" role="group" aria-label="Zoom controls">
+          <div className="flex items-center gap-1 sm:gap-2" role="group" aria-label="Zoom controls">
             <Button
               onClick={handleZoomOut}
               disabled={zoom <= 50}
               size="icon"
               variant="outline"
-              className="w-8 h-8"
+              className="w-7 h-7 sm:w-8 sm:h-8"
               aria-label={`Zoom out (current zoom: ${zoom}%)`}
             >
-              <Minus className="h-4 w-4" aria-hidden="true" />
+              <Minus className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
             </Button>
-            <span className="text-sm text-gray-500 min-w-[48px] text-center" aria-live="polite">
+            <span className="text-xs sm:text-sm text-gray-500 min-w-[40px] sm:min-w-[48px] text-center" aria-live="polite">
               {zoom}%
             </span>
             <Button
@@ -139,27 +161,27 @@ export function FloatingControls({
               disabled={zoom >= 110}
               size="icon"
               variant="outline"
-              className="w-8 h-8"
+              className="w-7 h-7 sm:w-8 sm:h-8"
               aria-label={`Zoom in (current zoom: ${zoom}%)`}
             >
-              <Plus className="h-4 w-4" aria-hidden="true" />
+              <Plus className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
             </Button>
           </div>
 
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="h-5 sm:h-6" />
 
           {/* Print/Download Button */}
           <RippleButton
             variant="ghost"
             size="icon"
             onClick={handlePrint}
-            className="relative overflow-hidden w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="relative overflow-hidden w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800"
             title="Download Resume (requires sign in)"
           >
-            <Download className="h-4 w-4" aria-hidden="true" />
+            <Download className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
           </RippleButton>
 
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="h-5 sm:h-6" />
 
           {/* Settings Button */}
           <div className="relative">
@@ -171,8 +193,9 @@ export function FloatingControls({
               aria-label="Open Settings Menu"
               aria-expanded={isSettingsOpen}
               aria-haspopup="dialog"
+              className="w-7 h-7 sm:w-8 sm:h-8"
             >
-              <Settings className="h-4 w-4" aria-hidden="true" />
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
             </Button>
 
             {isSettingsOpen && (
