@@ -8,7 +8,8 @@ export type EmailTemplateType =
   | "update"
   | "job-offer"
   | "blog-post"
-  | "weekly-summary";
+  | "weekly-summary"
+  | "bug-fix";
 
 export interface EmailTemplate {
   id: EmailTemplateType;
@@ -286,6 +287,65 @@ export const emailTemplates: Record<EmailTemplateType, EmailTemplate> = {
       
       <p style="margin: 30px 0 0 0; color: #4a4a4a; font-size: 14px; line-height: 1.6;">
         Have a great week!
+      </p>
+    `),
+  },
+
+  "bug-fix": {
+    id: "bug-fix",
+    name: "Bug Fix Announcement",
+    description: "Notify users about important bug fixes",
+    subject: "We Fixed It! Print Feature Now Working 🔧",
+    variables: ["name"],
+    html: getEmailBaseTemplate(`
+      <h2 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 24px; font-weight: 600;">
+        Hi {name}! 👋
+      </h2>
+      
+      <p style="margin: 0 0 20px 0; color: #4a4a4a; font-size: 16px; line-height: 1.6;">
+        We wanted to reach out personally to let you know about an important fix we've made.
+      </p>
+      
+      <div style="margin: 30px 0; padding: 30px; background-color: #fef2f2; border-left: 4px solid #ef4444; border-radius: 8px;">
+        <h3 style="margin: 0 0 15px 0; color: #1a1a1a; font-size: 20px; font-weight: 600;">
+          🔧 Print Feature Bug Fixed
+        </h3>
+        <p style="margin: 0; color: #4a4a4a; font-size: 15px; line-height: 1.8;">
+          We recently discovered that the print/download feature wasn't working correctly on desktop browsers. We're really sorry for any inconvenience this may have caused you.
+        </p>
+      </div>
+      
+      <div style="margin: 30px 0; padding: 30px; background-color: #ecfdf5; border-left: 4px solid #10b981; border-radius: 8px;">
+        <h3 style="margin: 0 0 15px 0; color: #1a1a1a; font-size: 20px; font-weight: 600;">
+          ✅ What We Fixed
+        </h3>
+        <ul style="margin: 0; padding-left: 20px; color: #4a4a4a; font-size: 15px; line-height: 1.8;">
+          <li style="margin-bottom: 10px;">Print preview now shows your resume correctly on desktop</li>
+          <li style="margin-bottom: 10px;">PDF downloads work seamlessly across all devices</li>
+          <li style="margin-bottom: 0;">Mobile and tablet printing has been improved</li>
+        </ul>
+      </div>
+      
+      <p style="margin: 0 0 20px 0; color: #4a4a4a; font-size: 16px; line-height: 1.6;">
+        <strong>You can now use the print feature without any issues!</strong> Go ahead and download your polished resume.
+      </p>
+      
+      <table role="presentation" style="width: 100%; border-collapse: collapse; margin: 30px 0;">
+        <tr>
+          <td align="center">
+            <a href="https://simpleresu.me/resume-builder" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);">
+              Try It Now →
+            </a>
+          </td>
+        </tr>
+      </table>
+      
+      <p style="margin: 30px 0 0 0; color: #4a4a4a; font-size: 14px; line-height: 1.6;">
+        Thank you for your patience and for being part of SimpleResu.me. We're committed to making your resume-building experience as smooth as possible.
+      </p>
+      
+      <p style="margin: 15px 0 0 0; color: #4a4a4a; font-size: 14px; line-height: 1.6;">
+        If you encounter any other issues, please don't hesitate to reach out!
       </p>
     `),
   },

@@ -212,10 +212,10 @@ export default function LandingPage() {
         <SharedHeader variant="builder" />
 
         {/* Desktop Layout */}
-        <div className="hidden lg:flex flex-1 overflow-hidden">
+        <div className="hidden lg:flex flex-1 overflow-hidden print:!flex">
           <PanelGroup direction="horizontal">
-            <Panel defaultSize={60} minSize={50} className="print:!w-full">
-              <div className="flex justify-center flex-col items-center h-full">
+            <Panel defaultSize={60} minSize={50} className="print:!w-full print:!flex-none">
+              <div className="flex justify-center flex-col items-center h-full print-resume-wrapper">
                 <Resume
                   key={JSON.stringify(userData)}
                   ref={resumeRef}

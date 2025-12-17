@@ -447,6 +447,13 @@ export default function LandingPage() {
             </Link>
             <span>|</span>
             <Link
+              href="/changelog"
+              className="hover:text-black transition-colors"
+            >
+              Changelog
+            </Link>
+            <span>|</span>
+            <Link
               href="/settings"
               className="hover:text-black transition-colors"
             >
