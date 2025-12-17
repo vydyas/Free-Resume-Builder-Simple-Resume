@@ -76,10 +76,53 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto -mx-4 sm:mx-0">
-          <table className="w-full min-w-[640px]">
+      {/* Mobile Cards View */}
+      <div className="lg:hidden space-y-4">
+        {filteredUsers.length === 0 ? (
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500">
+            {searchQuery ? "No users found" : "No users yet"}
+          </div>
+        ) : (
+          filteredUsers.map((user) => (
+            <div key={user.id} className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    {user.first_name || user.last_name
+                      ? `${user.first_name || ""} ${user.last_name || ""}`.trim()
+                      : "No name"}
+                  </h3>
+                  <p className="text-sm text-gray-600 break-all">{user.email}</p>
+                </div>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    user.email_subscription_enabled !== false
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {user.email_subscription_enabled !== false ? "Subscribed" : "Unsubscribed"}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                <div>
+                  <span className="font-medium text-gray-700">Joined:</span>{" "}
+                  {new Date(user.created_at).toLocaleDateString()}
+                </div>
+                <div className="font-mono truncate max-w-[150px]" title={user.clerk_user_id}>
+                  <span className="font-medium text-gray-700">ID:</span>{" "}
+                  {user.clerk_user_id.substring(0, 12)}...
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

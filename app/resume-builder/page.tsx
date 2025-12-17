@@ -12,6 +12,8 @@ import { UserData } from '@/types/resume';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { SharedHeader } from '@/components/shared-header';
 import { Eye, X } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { NamePromptModal } from "@/components/name-prompt-modal";
 
 const Resume = dynamic(
   () => import("@/components/resume").then((mod) => mod.Resume),
@@ -62,6 +64,30 @@ export default function LandingPage() {
   });
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [mobileZoom, setMobileZoom] = useState(100);
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const { user, isSignedIn } = useUser();
+
+  // Check if user needs to fill in their name
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (!isSignedIn) return;
+      
+      try {
+        const response = await fetch("/api/users/preferences");
+        if (response.ok) {
+          const data = await response.json();
+          // Show prompt if both firstName and lastName are empty
+          if (!data.firstName && !data.lastName) {
+            setShowNamePrompt(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking user profile:", error);
+      }
+    };
+
+    checkUserProfile();
+  }, [isSignedIn]);
 
   // Listen for print event to open mobile preview
   useEffect(() => {
@@ -175,6 +201,13 @@ export default function LandingPage() {
   return (
     <ErrorBoundary>
       <div className="flex flex-col bg-white h-screen">
+        {/* Name Prompt Modal */}
+        <NamePromptModal
+          open={showNamePrompt}
+          onClose={() => setShowNamePrompt(false)}
+          email={user?.primaryEmailAddress?.emailAddress || ""}
+        />
+
         {/* Navigation */}
         <SharedHeader variant="builder" />
 

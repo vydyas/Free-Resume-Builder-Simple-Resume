@@ -70,20 +70,16 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { emailSubscriptionEnabled, firstName, lastName } = body;
 
-    if (typeof emailSubscriptionEnabled !== "boolean") {
-      return NextResponse.json(
-        { error: "emailSubscriptionEnabled must be a boolean" },
-        { status: 400 }
-      );
-    }
-
     const updateData: {
-      email_subscription_enabled: boolean;
+      email_subscription_enabled?: boolean;
       first_name?: string;
       last_name?: string;
-    } = {
-      email_subscription_enabled: emailSubscriptionEnabled,
-    };
+    } = {};
+
+    // Only update emailSubscriptionEnabled if provided
+    if (typeof emailSubscriptionEnabled === "boolean") {
+      updateData.email_subscription_enabled = emailSubscriptionEnabled;
+    }
 
     if (firstName !== undefined) {
       updateData.first_name = firstName.trim() || null;
@@ -91,6 +87,14 @@ export async function PUT(request: NextRequest) {
 
     if (lastName !== undefined) {
       updateData.last_name = lastName.trim() || null;
+    }
+
+    // Ensure at least one field is being updated
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: "No valid fields to update" },
+        { status: 400 }
+      );
     }
 
     const { data: user, error } = await supabaseAdmin
