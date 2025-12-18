@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
+import { requireAdminAuth } from "../../lib/auth";
 import { getAllTemplates } from "@/lib/email-templates";
 
 // Cached function to get templates (templates are static, cache for longer)
@@ -16,6 +17,10 @@ const getCachedTemplates = unstable_cache(
 
 export async function GET() {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth();
+    if (authResult instanceof NextResponse) return authResult;
+
     const templates = await getCachedTemplates();
     
     const response = NextResponse.json({ templates });

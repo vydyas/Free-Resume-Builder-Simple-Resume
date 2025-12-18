@@ -49,8 +49,8 @@ export interface ResumeRef {
   downloadPDF: () => Promise<void>;
 }
 
-export const Resume = forwardRef<ResumeRef, ResumeProps>(
-  function Resume(
+export const Resume = React.memo(
+  forwardRef<ResumeRef, ResumeProps>(function Resume(
     {
       userData,
       config,
@@ -343,6 +343,16 @@ export const Resume = forwardRef<ResumeRef, ResumeProps>(
           </div>
         )}
       </div>
+    );
+  }),
+  (prevProps, nextProps) => {
+    // Return true if props are equal (skip re-render), false to re-render
+    return (
+      prevProps.userData === nextProps.userData &&
+      prevProps.config === nextProps.config &&
+      prevProps.githubId === nextProps.githubId &&
+      prevProps.template === nextProps.template &&
+      prevProps.zoom === nextProps.zoom
     );
   }
 );
