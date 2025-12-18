@@ -60,40 +60,36 @@ Generate professional resumes effortlessly using data from LinkedIn and GitHub. 
 
 3. **Set up environment variables**
 
-   Create a `.env` file in the root directory:
+   Use the provided example file as a starting point:
 
-   ```env
-   # Clerk Authentication
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
-   CLERK_SECRET_KEY=sk_test_your_secret_here
-
-   # Supabase Database
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
-
-   # LinkedIn OAuth (Optional)
-   NEXT_PUBLIC_LINKEDIN_CLIENT_ID=your_linkedin_client_id
-   LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
-
-   # App URL
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```bash
+   cp .env.example .env.local
    ```
+
+   Then edit `.env.local` and fill in your own keys:
+
+   - **Clerk**: `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
+   - **Supabase**: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+   - **Resend** (emails): `RESEND_API_KEY`, `FROM_EMAIL`
+   - **Google Analytics** (optional): `GA_TRACKING_ID`
+   - **App URL**: `NEXT_PUBLIC_APP_URL` (usually `http://localhost:3000` for local dev)
 
 4. **Set up the database**
 
    - Go to your Supabase project dashboard
-   - Navigate to the SQL Editor
-   - Run the migration script from `supabase-migration.sql`
+   - Navigate to the **SQL Editor**
+   - Run the migration script from `supabase-full-migration.sql`
 
    ```bash
    # The SQL file is located at:
-   # ./supabase-migration.sql
+   # ./supabase-full-migration.sql
    ```
 
-   This will create all necessary tables:
-   - `users` - User profiles synced with Clerk
-   - `resumes` - Resume data with JSONB fields
+   This will create all necessary tables for:
+   - `users` - User profiles and email preferences
+   - `feedback` - User feedback (with admin replies)
+   - `bug_reports` - Bug reports (status, comments, screenshots)
+   - `admins` - Admin accounts for the custom admin panel
 
 5. **Run the development server**
 
@@ -138,6 +134,42 @@ simpleresu.me/
 ├── supabase-migration.sql        # Database schema
 └── package.json                  # Dependencies
 ```
+
+---
+
+## 🧑‍💻 Contributing & Local Setup
+
+Want to hack on SimpleResu.me locally?
+
+- **Fork & clone**
+  - Fork this repo on GitHub, then:
+  - `git clone <your-fork-url> && cd simpleresu.me`
+  - Install deps with `pnpm install` (or `npm install` / `yarn`).
+
+- **Environment variables**
+  - Copy the example file: `cp .env.example .env.local`
+  - Fill in your own keys (do **not** reuse production keys):
+    - Create a **Clerk** app → set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
+    - Create a **Supabase** project → set `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+    - Create a **Resend** account & domain (for emails) → set `RESEND_API_KEY`, `FROM_EMAIL`
+    - Optionally add `GA_TRACKING_ID` if you want Google Analytics locally.
+
+- **Supabase schema**
+  - In Supabase, open the SQL editor and run `supabase-full-migration.sql`.
+  - This creates all app tables: users, feedback, bug_reports, admins, etc.
+  - Create at least one admin user manually (example, don’t commit this):
+
+    ```sql
+    INSERT INTO admins (username, password)
+    VALUES ('admin', 'your-strong-password');
+    ```
+
+- **Run the app**
+  - Start dev server: `pnpm dev`
+  - App: `http://localhost:3000`
+  - Admin login: `http://localhost:3000/admin/login` (use the admin user you inserted).
+
+When opening a PR, please mention any schema or env changes so others can keep their setup in sync.
 
 ---
 

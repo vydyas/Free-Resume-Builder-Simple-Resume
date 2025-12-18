@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, Settings, ChevronDown } from 'lucide-react';
+import { LogOut, Settings, ChevronDown, Bug as BugIcon } from 'lucide-react';
 
 export function UserMenu() {
   const { user } = useUser();
@@ -93,6 +93,16 @@ export function UserMenu() {
               Settings
             </button>
             <button
+              onClick={() => {
+                router.push('/reported-bugs');
+                setIsOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <BugIcon className="w-4 h-4" />
+              Reported bugs
+            </button>
+            <button
               onClick={handleSignOut}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
@@ -105,4 +115,5 @@ export function UserMenu() {
     </div>
   );
 }
+
 

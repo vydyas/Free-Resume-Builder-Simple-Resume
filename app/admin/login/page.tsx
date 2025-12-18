@@ -4,9 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin-header";
 
-const ADMIN_USERNAME = "siddhu123";
-const ADMIN_PASSWORD = "siddhu123";
-
 export default function AdminLoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
@@ -23,13 +20,26 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Store admin session
-      sessionStorage.setItem("admin_authenticated", "true");
-      sessionStorage.setItem("admin_login_time", Date.now().toString());
-      router.push("/admin/dashboard");
-    } else {
-      setError("Invalid username or password");
+    try {
+      const response = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        // Store admin session
+        sessionStorage.setItem("admin_authenticated", "true");
+        sessionStorage.setItem("admin_login_time", Date.now().toString());
+        router.push("/admin/dashboard");
+      } else {
+        const data = await response.json().catch(() => ({ error: "Invalid username or password" }));
+        setError(data.error || "Invalid username or password");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Admin login failed:", err);
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };
@@ -104,4 +114,5 @@ export default function AdminLoginPage() {
     </div>
   );
 }
+
 
