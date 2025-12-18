@@ -3,7 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Users, LayoutDashboard, LogOut, Mail, Menu, X } from "lucide-react";
+import {
+  Users,
+  LayoutDashboard,
+  LogOut,
+  Mail,
+  Menu,
+  X,
+  MessageSquareMore,
+  Bug,
+} from "lucide-react";
 
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -31,6 +40,16 @@ export function AdminSidebar() {
       name: "Emails",
       href: "/admin/emails",
       icon: Mail,
+    },
+    {
+      name: "Feedback",
+      href: "/admin/feedback",
+      icon: MessageSquareMore,
+    },
+    {
+      name: "Bug Reports",
+      href: "/admin/bugs",
+      icon: Bug,
     },
   ];
 
@@ -125,4 +144,5 @@ export function AdminSidebar() {
     </>
   );
 }
+
 

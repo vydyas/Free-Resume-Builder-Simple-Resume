@@ -18,3 +18,4 @@ COMMENT ON COLUMN users.email_subscription_enabled IS 'User email subscription p
 COMMENT ON COLUMN users.first_name IS 'User first name';
 COMMENT ON COLUMN users.last_name IS 'User last name';
 
+

@@ -144,7 +144,11 @@ export default function AdminEmailsPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        setUsers(data.users || []);
+        // Filter out users who have opted out of email subscriptions
+        const subscribedUsers = (data.users || []).filter(
+          (user: User) => user.email_subscription_enabled !== false
+        );
+        setUsers(subscribedUsers);
       } else {
         console.error("Failed to fetch users");
       }
@@ -800,4 +804,5 @@ export default function AdminEmailsPage() {
     </div>
   );
 }
+
 
