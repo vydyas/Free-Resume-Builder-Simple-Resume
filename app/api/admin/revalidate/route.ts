@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdminAuth } from "../../lib/auth";
 import { revalidateTag } from "next/cache";
 
 /**
@@ -7,6 +8,10 @@ import { revalidateTag } from "next/cache";
  */
 export async function POST(request: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth();
+    if (authResult instanceof NextResponse) return authResult;
+
     const searchParams = request.nextUrl.searchParams;
     const tag = searchParams.get("tag");
 
