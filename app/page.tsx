@@ -1,487 +1,363 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { SharedHeader } from "@/components/shared-header";
 
-const KEYWORDS = ["Builders", "Thinkers", "Developers", "Hackers", "Tinkerers"];
+const FEATURES = [
+  "Professional Templates",
+  "ATS Optimized",
+  "Export to PDF",
+  "Real-time Preview",
+  "Custom Sections",
+  "Easy to Use",
+];
 
 export default function LandingPage() {
   const router = useRouter();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [typingText, setTypingText] = useState("");
-  const [currentKeywordIndex, setCurrentKeywordIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
-
-  const resumeTemplates = [
-    {
-      title: "Modern Professional",
-      image: "/resume1.png",
-    },
-    {
-      title: "Minimalist Tech",
-      image: "/resume2.png",
-    },
-    {
-      title: "Executive Elite",
-      image: "/resume3.png",
-    },
-  ];
+  const [isVisible, setIsVisible] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [bounceOffset, setBounceOffset] = useState(0);
 
   useEffect(() => {
-    // Only auto-rotate if not dragging
-    if (!isDragging) {
-      autoRotateRef.current = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % resumeTemplates.length);
-      }, 4000);
-    } else {
-      if (autoRotateRef.current) {
-        clearInterval(autoRotateRef.current);
-      }
-    }
-    return () => {
-      if (autoRotateRef.current) {
-        clearInterval(autoRotateRef.current);
-      }
-    };
-  }, [resumeTemplates.length, isDragging]);
+    setTimeout(() => setIsVisible(true), 100);
 
-  // Mouse drag handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-    setDragStart(e.clientX);
-    setDragOffset(0);
-  };
-
-  const handleMouseUp = () => {
-    if (!isDragging) return;
-
-    // Determine if we should change slides based on drag distance
-    const threshold = 50; // Minimum pixels to trigger slide change
-    if (Math.abs(dragOffset) > threshold) {
-      if (dragOffset > 0) {
-        // Dragged right, go to previous slide
-        setCurrentSlide(
-          (prev) => (prev - 1 + resumeTemplates.length) % resumeTemplates.length
-        );
-      } else {
-        // Dragged left, go to next slide
-        setCurrentSlide((prev) => (prev + 1) % resumeTemplates.length);
-      }
-    }
-
-    setIsDragging(false);
-    setDragOffset(0);
-  };
-
-  // Touch handlers for mobile/tablet
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    setDragStart(e.touches[0].clientX);
-    setDragOffset(0);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    e.preventDefault(); // Prevent scrolling while dragging
-    const offset = e.touches[0].clientX - dragStart;
-    setDragOffset(offset);
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-
-    // Determine if we should change slides based on drag distance
-    const threshold = 50; // Minimum pixels to trigger slide change
-    if (Math.abs(dragOffset) > threshold) {
-      if (dragOffset > 0) {
-        // Dragged right, go to previous slide
-        setCurrentSlide(
-          (prev) => (prev - 1 + resumeTemplates.length) % resumeTemplates.length
-        );
-      } else {
-        // Dragged left, go to next slide
-        setCurrentSlide((prev) => (prev + 1) % resumeTemplates.length);
-      }
-    }
-
-    setIsDragging(false);
-    setDragOffset(0);
-  };
-
-  // Global mouse up handler to handle drag outside carousel
-  useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      if (!isDragging) return;
-
-      // Determine if we should change slides based on drag distance
-      const threshold = 50; // Minimum pixels to trigger slide change
-      if (Math.abs(dragOffset) > threshold) {
-        if (dragOffset > 0) {
-          // Dragged right, go to previous slide
-          setCurrentSlide(
-            (prev) =>
-              (prev - 1 + resumeTemplates.length) % resumeTemplates.length
-          );
-        } else {
-          // Dragged left, go to next slide
-          setCurrentSlide((prev) => (prev + 1) % resumeTemplates.length);
-        }
-      }
-
-      setIsDragging(false);
-      setDragOffset(0);
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
     };
 
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        const offset = e.clientX - dragStart;
-        setDragOffset(offset);
-      }
+    // Bounce animation
+    let startTime: number;
+    const animateBounce = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const bounce = Math.sin(elapsed / 500) * 8; // 8px bounce
+      setBounceOffset(bounce);
+      requestAnimationFrame(animateBounce);
     };
 
-    if (isDragging) {
-      document.addEventListener("mouseup", handleGlobalMouseUp);
-      document.addEventListener("mousemove", handleGlobalMouseMove);
-    }
+    const bounceFrame = requestAnimationFrame(animateBounce);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      document.removeEventListener("mouseup", handleGlobalMouseUp);
-      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(bounceFrame);
     };
-  }, [isDragging, dragStart, dragOffset, resumeTemplates.length]);
-
-  // Typing effect for keywords
-  useEffect(() => {
-    const currentKeyword = KEYWORDS[currentKeywordIndex];
-    let timeout: NodeJS.Timeout;
-
-    if (!isDeleting) {
-      // Typing
-      if (typingText.length < currentKeyword.length) {
-        timeout = setTimeout(() => {
-          setTypingText(currentKeyword.slice(0, typingText.length + 1));
-        }, 100);
-      } else {
-        // Finished typing, wait then start deleting
-        timeout = setTimeout(() => {
-          setIsDeleting(true);
-        }, 2000);
-      }
-    } else {
-      // Deleting
-      if (typingText.length > 0) {
-        timeout = setTimeout(() => {
-          setTypingText(typingText.slice(0, -1));
-        }, 50);
-      } else {
-        // Finished deleting, move to next keyword
-        setIsDeleting(false);
-        setCurrentKeywordIndex((prev) => (prev + 1) % KEYWORDS.length);
-      }
-    }
-
-    return () => clearTimeout(timeout);
-  }, [typingText, currentKeywordIndex, isDeleting]);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-emerald-50/20 to-teal-50/30 relative overflow-hidden">
-      {/* Unified background gradient overlays */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-200/20 to-teal-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-cyan-200/20 to-teal-200/20 rounded-full blur-3xl"></div>
-      </div>
-
-      {/* Navigation */}
+    <div className="bg-white">
       <SharedHeader variant="landing" />
 
-      {/* Hero Section - Split Layout */}
-      <main className="min-h-[calc(100vh-4rem)] flex items-center py-8 lg:py-0 relative z-10">
-        <div className="w-full">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-0 min-h-[calc(100vh-4rem)]">
-            {/* Left Side - Tagline */}
-            <div className="flex items-center justify-center px-4 sm:px-8 lg:px-16 order-2 lg:order-1 relative">
-              <div className="max-w-xl space-y-6 lg:space-y-8 w-full relative z-10">
-                <div className="space-y-4 lg:space-y-6">
-                  <div className="inline-block">
-                    <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/50 text-zinc-700 text-xs sm:text-sm font-medium shadow-sm">
-                      Built for :{" "}
-                      <span className="inline-block min-w-[140px] text-left">
-                        <span className="text-emerald-600 font-semibold">
-                          {typingText}
-                        </span>
-                      </span>
-                    </span>
-                  </div>
+      <main className="relative pt-16">
+        {/* Hero Section */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-4 py-16 sm:py-20">
+          <div
+            className={`text-center transition-all duration-1000 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight px-2 leading-tight">
+              <span className="block text-gray-900">Be (part of)</span>
+              <span className="block bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent leading-tight">
+                something new
+              </span>
+            </h1>
 
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
-                    <span className="block text-gray-900 mb-1 sm:mb-2">
-                      Craft Your
-                    </span>
-                    <span className="block bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                      Perfect Resume
-                    </span>
-                  </h1>
+            <p className="text-lg sm:text-xl md:text-xl text-gray-400 max-w-3xl mx-auto px-4 leading-relaxed">
+              Build resumes that get you noticed and land interviews
+            </p>
 
-                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed">
-                    Stand out from the crowd with professionally designed
-                    resumes. Built for developers, designers, and tech
-                    professionals.
-                  </p>
-                </div>
-
-                {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 lg:pt-4">
-                  <button
-                    onClick={() => router.push("/resume-builder")}
-                    className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-lg hover:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/40 flex items-center justify-center space-x-2 text-sm sm:text-base font-semibold w-full sm:w-auto overflow-hidden transform hover:scale-[1.02] active:scale-100"
-                  >
-                    <span className="relative z-10">Create Your Resume</span>
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300 relative z-10" />
-                  </button>
-
-                  {/* <button
-                    onClick={() => router.push('/resume-score')}
-                    className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-gray-900 rounded-lg border-2 border-gray-200 hover:border-emerald-300 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center text-sm sm:text-base font-semibold w-full sm:w-auto"
-                  >
-                    Get Your Resume Score
-                  </button> */}
-                </div>
-
-                {/* Social Proof */}
-                <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-4">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <svg
-                          key={i}
-                          className="w-4 h-4 text-emerald-500 fill-current"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600 font-medium">
-                      4.9/5
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <svg
-                      className="w-5 h-5 text-emerald-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <span className="text-sm font-medium">
-                      5K+ Resumes Printed
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 lg:pt-8 border-t border-emerald-100">
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                      10+
-                    </div>
-                    <div className="text-xs sm:text-sm text-gray-500">
-                      Templates
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                      5K+
-                    </div>
-                    <div className="text-xs sm:text-sm text-gray-500">
-                      Users
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                      ATS
-                    </div>
-                    <div className="text-xs sm:text-sm text-gray-500">
-                      Optimized
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side - Resume Carousel */}
-            <div className="flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden order-1 lg:order-2 py-8 lg:py-0">
-              {/* Subtle background pattern */}
-              <div className="absolute inset-0 opacity-20">
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle at 1px 1px, rgb(16 185 129 / 0.1) 1px, transparent 0)",
-                    backgroundSize: "40px 40px",
-                  }}
-                ></div>
-              </div>
-
-              {/* 3D Resume Carousel */}
-              <div
-                ref={carouselRef}
-                className="relative w-full max-w-[400px] sm:max-w-md md:max-w-lg lg:max-w-xl z-10 cursor-grab active:cursor-grabbing select-none"
-                style={{ perspective: "1200px" }}
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
+            <div className="mt-8 sm:mt-12">
+              <button
+                onClick={() => router.push("/resume-builder")}
+                className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-base sm:text-lg font-semibold rounded-full hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105"
               >
-                <div className="relative h-[500px] sm:h-[600px] md:h-[700px]">
-                  {resumeTemplates.map((template, index) => {
-                    // Calculate the relative position from current slide
-                    let position = index - currentSlide;
+                <span>Start Building</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </div>
+          </div>
 
-                    // Handle circular wrapping
-                    if (position > resumeTemplates.length / 2) {
-                      position -= resumeTemplates.length;
-                    } else if (position < -resumeTemplates.length / 2) {
-                      position += resumeTemplates.length;
-                    }
+          {/* Resume Images */}
+          <div className="mt-12 sm:mt-16 md:mt-20 w-full max-w-7xl px-4 sm:px-6 md:px-8">
+            <div className="relative h-[400px] sm:h-[450px] md:h-[600px] flex items-center justify-center gap-4 sm:gap-6 md:gap-8">
+              {/* Image 1 - Left - Hidden on mobile */}
+              <div
+                className={`hidden sm:block w-[220px] h-[300px] sm:w-[260px] sm:h-[350px] md:w-[350px] md:h-[470px] rounded-2xl overflow-hidden shadow-2xl transition-opacity duration-1000 delay-700 ${
+                  isVisible ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  transform: isVisible
+                    ? `perspective(1000px) rotateY(15deg) rotateX(-5deg) translateY(${scrollY * -0.15 + bounceOffset}px)`
+                    : "perspective(1000px) rotateY(45deg) rotateX(-15deg)",
+                }}
+              >
+                <Image
+                  src="/resume1.png"
+                  alt="Resume template 1"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
 
-                    // Apply drag offset for smooth dragging
-                    const dragOffsetX = isDragging ? dragOffset * 0.3 : 0;
+              {/* Image 2 - Center - Always visible */}
+              <div
+                className={`w-[280px] h-[380px] sm:w-[280px] sm:h-[380px] md:w-[380px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl z-10 transition-opacity duration-1000 delay-900 ${
+                  isVisible ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  transform: isVisible
+                    ? `perspective(1000px) rotateY(-5deg) rotateX(-3deg) translateY(${scrollY * -0.2 + bounceOffset * 1.2}px)`
+                    : "perspective(1000px) rotateY(-25deg) rotateX(-10deg)",
+                }}
+              >
+                <Image
+                  src="/resume2.png"
+                  alt="Resume template 2"
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
-                    // Calculate rotation angle (60 degrees per position)
-                    const rotateY = position * 60;
-                    // Calculate Z translation (depth)
-                    const translateZ = -Math.abs(position) * 150;
-                    // Calculate X translation (horizontal position) with drag offset
-                    const translateX = position * 120 + dragOffsetX;
-                    // Opacity based on position (center = 1, sides = 0.3 for better visibility of reduced opacity)
-                    const opacity = position === 0 ? 1 : 0.3;
-                    // Scale based on position (center = 1, sides = 0.85)
-                    const scale = position === 0 ? 1 : 0.85;
-                    // Z-index to ensure center is on top
-                    const zIndex = position === 0 ? 10 : 5 - Math.abs(position);
-
-                    return (
-                      <div
-                        key={index}
-                        className="absolute inset-0 transition-all duration-700 ease-in-out"
-                        style={{
-                          transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-                          opacity: opacity,
-                          zIndex: zIndex,
-                          transformStyle: "preserve-3d",
-                          pointerEvents: position === 0 ? "auto" : "none",
-                          transition: isDragging
-                            ? "none"
-                            : "all 0.7s ease-in-out",
-                        }}
-                      >
-                        {/* Resume Image */}
-                        <div
-                          className="relative w-full h-full"
-                          style={{ borderRadius: "5%" }}
-                        >
-                          <Image
-                            src={template.image}
-                            alt={template.title}
-                            fill
-                            className="object-contain"
-                            style={{ borderRadius: "5%" }}
-                            priority={index === 0}
-                            sizes="(max-width: 640px) 400px, (max-width: 768px) 448px, (max-width: 1024px) 512px, 640px"
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Carousel Indicators */}
-                <div className="flex justify-center gap-1.5 sm:gap-2 mt-8 sm:mt-10">
-                  {resumeTemplates.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
-                        index === currentSlide
-                          ? "w-8 sm:w-10 bg-gradient-to-r from-emerald-500 to-teal-500"
-                          : "w-2 sm:w-2.5 bg-emerald-200 hover:bg-emerald-300"
-                      }`}
-                      aria-label={`View resume ${index + 1}`}
-                    />
-                  ))}
-                </div>
+              {/* Image 3 - Right - Hidden on mobile */}
+              <div
+                className={`hidden sm:block w-[220px] h-[300px] sm:w-[260px] sm:h-[350px] md:w-[350px] md:h-[470px] rounded-2xl overflow-hidden shadow-2xl transition-opacity duration-1000 delay-1100 ${
+                  isVisible ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  transform: isVisible
+                    ? `perspective(1000px) rotateY(-15deg) rotateX(-5deg) translateY(${scrollY * -0.18 + bounceOffset * 0.8}px)`
+                    : "perspective(1000px) rotateY(-45deg) rotateX(-15deg)",
+                }}
+              >
+                <Image
+                  src="/resume3.png"
+                  alt="Resume template 3"
+                  fill
+                  className="object-cover"
+                />
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Ticker Tape */}
+        <section className="sticky top-16 bg-gradient-to-r from-gray-50 to-gray-100 border-y border-gray-200 py-4 overflow-hidden z-40">
+          <div className="flex animate-scroll whitespace-nowrap">
+            {[...FEATURES, ...FEATURES, ...FEATURES, ...FEATURES].map((feature, i) => (
+              <div
+                key={i}
+                className="inline-flex items-center px-6 text-gray-700 font-medium"
+              >
+                <span>{feature}</span>
+                <span className="mx-6 text-emerald-500">•</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="bg-white py-32 px-4">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-5xl md:text-6xl font-bold text-center mb-20">
+              <span className="text-gray-900">Everything you need</span>
+              <br />
+              <span className="bg-gradient-to-r from-emerald-500 to-cyan-600 bg-clip-text text-transparent">
+                to land your dream job
+              </span>
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { icon: "✓", title: "ATS-Optimized", desc: "Pass applicant tracking systems" },
+                { icon: "📄", title: "Professional Templates", desc: "10+ expertly designed templates" },
+                { icon: "👁", title: "Real-time Preview", desc: "See changes instantly" },
+                { icon: "⬇", title: "PDF Export", desc: "Download print-ready PDFs" },
+                { icon: "⚙", title: "Custom Sections", desc: "Add and reorder any section" },
+                { icon: "📱", title: "Mobile Friendly", desc: "Build on any device" },
+              ].map((feature, i) => (
+                <div
+                  key={i}
+                  className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-emerald-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 py-20 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+              {[
+                { value: "5K+", label: "Resumes Created" },
+                { value: "10+", label: "Templates" },
+                { value: "4.9", label: "User Rating" },
+                { value: "100%", label: "Free Forever" },
+              ].map((stat, i) => (
+                <div key={i}>
+                  <div className="text-5xl md:text-6xl font-bold mb-2">{stat.value}</div>
+                  <div className="text-sm md:text-base opacity-90">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-white py-32 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-5xl md:text-6xl font-bold mb-8">
+              <span className="text-gray-900">Ready to build your</span>
+              <br />
+              <span className="bg-gradient-to-r from-emerald-500 to-cyan-600 bg-clip-text text-transparent">
+                perfect resume?
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 mb-12">
+              Join thousands of job seekers who landed their dream roles
+            </p>
+            <button
+              onClick={() => router.push("/resume-builder")}
+              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-xl font-bold rounded-full hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105"
+            >
+              <span>Get Started Free</span>
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200 py-6 sm:py-8 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-zinc-500">
-            <Link
-              href="/blog"
-              className="hover:text-black transition-colors"
-            >
-              Blog
-            </Link>
-            <span>|</span>
-            <Link
-              href="/changelog"
-              className="hover:text-black transition-colors"
-            >
-              Changelog
-            </Link>
-            <span>|</span>
-            <Link
-              href="/settings"
-              className="hover:text-black transition-colors"
-            >
-              Settings
-            </Link>
-            <span>|</span>
-            <a
-              href="https://www.linkedin.com/in/siddhucse/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-black transition-colors"
-            >
-              LinkedIn
-            </a>
-            <span>|</span>
-            <a
-              href="https://github.com/vydyas/Free-Resume-Builder-Simple-Resume"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-black transition-colors"
-            >
-              GitHub
-            </a>
-            <span>|</span>
-            <span>Made with ❤️ in India</span>
+      <footer className="relative border-t border-gray-200 bg-white overflow-hidden">
+        {/* Top Section with Links */}
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8">
+            {/* Left Side - Brand and Description */}
+            <div className="max-w-md">
+              <h3 className="text-3xl font-normal mb-3" style={{ fontFamily: 'var(--font-great-vibes), cursive' }}>
+                <span className="text-black">SimpleResu</span>
+                <span className="text-emerald-500">.me</span>
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Build professional resumes that get you noticed and land interviews. Free forever.
+              </p>
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://www.linkedin.com/in/siddhucse/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-gray-500 hover:text-emerald-500 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                  LinkedIn
+                </a>
+                <a
+                  href="https://github.com/vydyas/Free-Resume-Builder-Simple-Resume"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-gray-500 hover:text-emerald-500 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                  GitHub
+                </a>
+              </div>
+            </div>
+
+            {/* Right Side - Quick Links */}
+            <div className="flex flex-wrap gap-8">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">Product</h4>
+                <div className="flex flex-col gap-2 text-gray-600">
+                  <Link href="/blog" className="hover:text-emerald-500 transition-colors">
+                    Blog
+                  </Link>
+                  <Link href="/changelog" className="hover:text-emerald-500 transition-colors">
+                    Changelog
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scrolling Text Section */}
+        <div className="relative pb-10 bg-gradient-to-b from-white to-gray-50 footer-scroll-container overflow-hidden">
+          <div className="flex animate-scroll-footer whitespace-nowrap footer-scroll-content">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="inline-flex items-center">
+                <span className="text-[140px] sm:text-[200px] md:text-[280px] lg:text-[320px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400/20 via-teal-500/20 to-cyan-600/20 hover:from-emerald-400 hover:via-teal-500 hover:to-cyan-600 transition-all duration-500 px-12 cursor-default select-none footer-text leading-none">
+                  SimpleResu.me
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom Copyright */}
+        <div className="relative border-t border-gray-200 py-6 bg-white z-10">
+          <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
+            <p>© 2025 SimpleResu.me • Made with ❤️ in India • All Rights Reserved</p>
           </div>
         </div>
       </footer>
+
+      <style jsx>{`
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-25%);
+          }
+        }
+
+        @keyframes scroll-footer {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-33.33%);
+          }
+        }
+
+        .animate-scroll {
+          animation: scroll 20s linear infinite;
+        }
+
+        .animate-scroll-footer {
+          animation: scroll-footer 15s linear infinite;
+        }
+
+        .footer-text {
+          transition: all 0.5s ease;
+        }
+
+        .footer-text:hover {
+          text-shadow:
+            0 0 20px rgba(16, 185, 129, 0.8),
+            0 0 40px rgba(16, 185, 129, 0.6),
+            0 0 60px rgba(16, 185, 129, 0.4),
+            0 0 80px rgba(16, 185, 129, 0.3);
+        }
+
+        .footer-scroll-container:hover .footer-scroll-content {
+          animation-play-state: paused;
+        }
+      `}</style>
     </div>
   );
 }

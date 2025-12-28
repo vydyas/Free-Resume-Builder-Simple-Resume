@@ -26,35 +26,17 @@ export function SharedHeader({}: SharedHeaderProps) {
 
   return (
     <>
-      <nav className="w-full bg-gradient-to-r from-white via-emerald-50/30 to-white border-b border-emerald-100/50 z-50 print:hidden">
+      <nav className="fixed top-0 w-full bg-gradient-to-r from-white via-emerald-50/30 to-white border-b border-emerald-100/50 z-50 print:hidden backdrop-blur-sm bg-opacity-95">
         <div className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity">
               <span className={`text-2xl sm:text-3xl font-normal`} style={{ fontFamily: 'var(--font-great-vibes), cursive' }}>
                 <span className="text-black">SimpleResu</span>
-                <span className="text-zinc-400">.me</span>
+                <span className="text-emerald-500">.me</span>
               </span>
             </Link>
 
             <div className="flex items-center space-x-4">
-              {/* Primary actions */}
-              <div className="hidden sm:flex items-center space-x-3 text-sm text-zinc-600">
-                <button
-                  type="button"
-                  onClick={() => setShowFeedbackModal(true)}
-                  className="hover:text-black transition-colors"
-                >
-                  Feedback
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowBugModal(true)}
-                  className="hover:text-black transition-colors"
-                >
-                  Report a bug
-                </button>
-              </div>
-
               {/* Auth / user menu */}
               <div className="flex items-center space-x-2 sm:space-x-3">
               {isLoaded && (
@@ -62,12 +44,31 @@ export function SharedHeader({}: SharedHeaderProps) {
                   {!isSignedIn ? (
                     <button
                       onClick={handleSignIn}
-                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-black text-white rounded-lg hover:bg-zinc-800 transition-all duration-200 font-medium"
+                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-full hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 font-semibold transform hover:scale-105"
                     >
                       Sign In
                     </button>
                   ) : (
-                    <UserMenu />
+                    <>
+                      {/* Primary actions - only show when signed in */}
+                      <div className="hidden sm:flex items-center space-x-3 text-sm text-zinc-600">
+                        <button
+                          type="button"
+                          onClick={() => setShowFeedbackModal(true)}
+                          className="hover:text-black transition-colors"
+                        >
+                          Feedback
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowBugModal(true)}
+                          className="hover:text-black transition-colors"
+                        >
+                          Report a bug
+                        </button>
+                      </div>
+                      <UserMenu />
+                    </>
                   )}
                 </>
               )}

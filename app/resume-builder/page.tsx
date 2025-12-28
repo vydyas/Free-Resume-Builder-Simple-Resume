@@ -200,7 +200,7 @@ export default function LandingPage() {
 
   return (
     <ErrorBoundary>
-      <div className="flex flex-col bg-white h-screen">
+      <div className="flex flex-col bg-white h-screen pt-16">
         {/* Name Prompt Modal */}
         <NamePromptModal
           open={showNamePrompt}
@@ -212,7 +212,7 @@ export default function LandingPage() {
         <SharedHeader variant="builder" />
 
         {/* Desktop Layout */}
-        <div className="hidden lg:flex flex-1 overflow-hidden print:!flex">
+        <div className="hidden lg:flex flex-1 overflow-hidden print:!flex print:pt-0">
           <PanelGroup direction="horizontal">
             <Panel defaultSize={60} minSize={50} className="print:!w-full print:!flex-none">
               <div className="flex justify-center flex-col items-center h-full print-resume-wrapper">
