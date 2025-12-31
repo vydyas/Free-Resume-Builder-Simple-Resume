@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
+import { requireAdminAuth } from "../../lib/auth";
 import { supabaseAdmin } from "../../lib/supabase-server";
 
 // Cached function to fetch users
@@ -25,8 +26,9 @@ const getCachedUsers = unstable_cache(
 
 export async function GET() {
   try {
-    // In production, add proper admin authentication here
-    // For now, we'll allow access from the admin dashboard
+    // Require admin authentication
+    const authResult = await requireAdminAuth();
+    if (authResult instanceof NextResponse) return authResult;
     
     const users = await getCachedUsers();
 

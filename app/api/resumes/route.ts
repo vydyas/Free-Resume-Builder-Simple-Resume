@@ -3,6 +3,7 @@ import { requireAuth } from '../lib/auth';
 import { supabaseAdmin } from '../lib/supabase-server';
 import { errorResponse, ApiError } from '../lib/errors';
 import { createResumeSchema } from '../lib/validation';
+import { withUserRateLimit } from '../lib/rate-limit';
 
 /**
  * @openapi
@@ -171,6 +172,12 @@ export async function GET() {
  *               $ref: '#/components/schemas/Error'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       429:
+ *         description: Rate limit exceeded (max 100 requests per minute per user)
  *         content:
  *           application/json:
  *             schema:

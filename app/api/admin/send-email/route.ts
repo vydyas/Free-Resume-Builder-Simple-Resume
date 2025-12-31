@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdminAuth } from "../../lib/auth";
 import { supabaseAdmin } from "../../lib/supabase-server";
 import { errorResponse } from "../../lib/errors";
 import { sendCustomEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth();
+    if (authResult instanceof NextResponse) return authResult;
+
     const body = await request.json();
     const { userIds, subject, content } = body;
 

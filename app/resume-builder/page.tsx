@@ -217,7 +217,6 @@ export default function LandingPage() {
             <Panel defaultSize={60} minSize={50} className="print:!w-full print:!flex-none">
               <div className="flex justify-center flex-col items-center h-full print-resume-wrapper">
                 <Resume
-                  key={JSON.stringify(userData)}
                   ref={resumeRef}
                   template={template}
                   githubId={githubId}
