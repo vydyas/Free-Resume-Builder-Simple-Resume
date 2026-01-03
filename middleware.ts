@@ -8,6 +8,8 @@ const isPublicRoute = createRouteMatcher([
   "/resume-builder",
   "/blog",
   "/blog/:slug",
+  "/review-my-resume",
+  "/review-resume(.*)", // Public review pages (including /review-resume/[token])
   "/admin(.*)", // Admin routes have their own authentication
 ]);
 
@@ -23,6 +25,11 @@ export default clerkMiddleware(async (auth, request) => {
   if (pathname.startsWith("/blog/editor")) {
     await auth.protect();
     return;
+  }
+
+  // Public review resume pages (with token)
+  if (pathname.startsWith("/review-resume/") && pathname !== "/review-resume") {
+    return; // Allow public access to review pages
   }
 
   if (!isPublicRoute(request)) {

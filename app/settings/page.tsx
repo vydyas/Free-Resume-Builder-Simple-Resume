@@ -225,11 +225,11 @@ export default function SettingsPage() {
                 <div className="space-y-6">
                   {/* Profile Information Card */}
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Profile information</h2>
+                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Profile information</h2>
                     <div className="space-y-0">
                       <button
                         onClick={() => setProfileModalOpen(true)}
-                        className="w-full flex items-center justify-between py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group first:pt-0"
+                        className="w-full flex items-center justify-between py-3 sm:py-4 border-b border-gray-100 hover:bg-gray-50 active:bg-gray-100 transition-colors group first:pt-0 touch-manipulation"
                       >
                         <div className="flex-1 text-left">
                           <div className="font-medium text-gray-900">Name, location, and industry</div>
@@ -258,13 +258,13 @@ export default function SettingsPage() {
 
               {/* Notifications Section */}
               {activeSection === "notifications" && userData && (
-                <div className="space-y-6">
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Email preferences</h2>
+                <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6">
+                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Email preferences</h2>
                     <div className="space-y-0">
                       <button
                         onClick={() => setEmailModalOpen(true)}
-                        className="w-full flex items-center justify-between py-4 hover:bg-gray-50 transition-colors group"
+                        className="w-full flex items-center justify-between py-3 sm:py-4 hover:bg-gray-50 active:bg-gray-100 transition-colors group touch-manipulation"
                       >
                         <div className="flex-1 text-left">
                           <div className="font-medium text-gray-900">Email notifications</div>
@@ -303,5 +303,6 @@ export default function SettingsPage() {
     </div>
   );
 }
+
 
 

@@ -19,3 +19,4 @@ COMMENT ON COLUMN users.first_name IS 'User first name';
 COMMENT ON COLUMN users.last_name IS 'User last name';
 
 
+

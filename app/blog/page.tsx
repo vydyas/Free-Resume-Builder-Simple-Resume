@@ -23,26 +23,26 @@ export default function BlogPage() {
     <div className="min-h-screen bg-white">
       <SharedHeader variant="landing" />
       
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="mb-16">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-8 sm:py-12 md:py-16">
+        <div className="mb-8 sm:mb-12 md:mb-16">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
             Blog
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600">
             Expert tips and insights to help you create the perfect resume and advance your career.
           </p>
         </div>
 
         {posts.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-gray-500">No blog posts yet. Check back soon!</p>
+          <div className="text-center py-12 sm:py-16 md:py-20">
+            <p className="text-sm sm:text-base text-gray-500">No blog posts yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-10 md:space-y-12">
             {posts.map((post) => (
               <article
                 key={post.slug}
-                className="border-b border-gray-200 pb-12 last:border-0 last:pb-0"
+                className="border-b border-gray-200 pb-8 sm:pb-10 md:pb-12 last:border-0 last:pb-0"
               >
                 <Link href={`/blog/${post.slug}`} className="group block">
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
@@ -58,11 +58,11 @@ export default function BlogPage() {
                     )}
                   </div>
                   
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-emerald-600 transition-colors">
                     {post.title}
                   </h2>
                   
-                  <p className="text-gray-600 mb-4 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
                     {post.excerpt}
                   </p>
                   
@@ -87,6 +87,7 @@ export default function BlogPage() {
     </div>
   );
 }
+
 
 
 

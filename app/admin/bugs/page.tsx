@@ -54,16 +54,16 @@ export default function AdminBugsPage() {
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Bug Reports</h1>
-        <p className="text-gray-600 mt-1 text-sm sm:text-base">
+    <div className="flex-1 p-4 sm:p-5 md:p-6 lg:p-8">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Bug Reports</h1>
+        <p className="text-gray-600 mt-1 text-xs sm:text-sm md:text-base">
           Track and investigate issues reported by users.
         </p>
       </div>
 
       {/* Status filter */}
-      <div className="mb-4 bg-white rounded-lg border border-gray-200 p-3 sm:p-4 flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-600">
+      <div className="mb-3 sm:mb-4 bg-white rounded-lg border border-gray-200 p-3 sm:p-4 md:p-5 flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
         <span className="font-medium">Status:</span>
         <select
           value={statusFilter}
@@ -172,3 +172,4 @@ export default function AdminBugsPage() {
     </div>
   );
 }
+

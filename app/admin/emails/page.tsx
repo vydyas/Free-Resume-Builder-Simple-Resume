@@ -383,7 +383,7 @@ export default function AdminEmailsPage() {
   );
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 relative">
+    <div className="flex-1 p-4 sm:p-5 md:p-6 lg:p-8 relative">
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-5 max-w-[calc(100vw-2rem)]">
@@ -804,5 +804,6 @@ export default function AdminEmailsPage() {
     </div>
   );
 }
+
 
 

@@ -130,3 +130,4 @@ export function NamePromptModal({ open, onClose, email }: NamePromptModalProps) 
   );
 }
 
+

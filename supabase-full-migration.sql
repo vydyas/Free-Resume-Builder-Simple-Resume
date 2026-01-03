@@ -102,3 +102,4 @@ CREATE TABLE IF NOT EXISTS admins (
 -- Seed admin users manually via Supabase dashboard or a private script.
 -- Example (do NOT commit real passwords):
 -- INSERT INTO admins (username, password) VALUES ('your_admin', 'your_strong_password');
+

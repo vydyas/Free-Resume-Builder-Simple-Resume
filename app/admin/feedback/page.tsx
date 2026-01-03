@@ -144,16 +144,16 @@ export default function AdminFeedbackPage() {
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Feedback</h1>
-        <p className="text-gray-600 mt-1 text-sm sm:text-base">
+    <div className="flex-1 p-4 sm:p-5 md:p-6 lg:p-8">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Feedback</h1>
+        <p className="text-gray-600 mt-1 text-xs sm:text-sm md:text-base">
           See what users are saying about SimpleResu.me.
         </p>
       </div>
 
       {/* Filters */}
-      <div className="mb-4 bg-white rounded-lg border border-gray-200 p-3 sm:p-4">
+      <div className="mb-3 sm:mb-4 bg-white rounded-lg border border-gray-200 p-3 sm:p-4 md:p-5">
         <div className="flex items-center gap-2 mb-3 text-xs text-gray-500">
           <Filter className="w-3 h-3" />
           <span>Filter &amp; search</span>
@@ -372,3 +372,4 @@ export default function AdminFeedbackPage() {
     </div>
   );
 }
+

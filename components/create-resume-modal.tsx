@@ -20,21 +20,70 @@ interface CreateResumeModalProps {
 export function CreateResumeModal({ open, onOpenChange }: CreateResumeModalProps) {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
-  const handleManualCreate = () => {
-    router.push('/resume-builder');
-    onOpenChange(false);
+  const handleManualCreate = async () => {
+    try {
+      setIsCreating(true);
+      const response = await fetch("/api/resumes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: "My Resume",
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to create resume");
+        return;
+      }
+
+      const data = await response.json();
+      const newResume = data.resume;
+
+      // Navigate to the resume builder with the new resume ID
+      router.push(`/resume-builder/${newResume.id}`);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error creating resume:", error);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     // TODO: Implement resume upload functionality
     setIsUploading(true);
-    // For now, just navigate to builder after a brief delay
-    setTimeout(() => {
-      setIsUploading(false);
-      router.push('/resume-builder');
+    // For now, create a new resume and navigate to builder
+    try {
+      const response = await fetch("/api/resumes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: "My Resume",
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to create resume");
+        return;
+      }
+
+      const data = await response.json();
+      const newResume = data.resume;
+
+      // Navigate to the resume builder with the new resume ID
+      router.push(`/resume-builder/${newResume.id}`);
       onOpenChange(false);
-    }, 500);
+    } catch (error) {
+      console.error("Error creating resume:", error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -84,17 +133,20 @@ export function CreateResumeModal({ open, onOpenChange }: CreateResumeModalProps
           {/* Manual Create Option */}
           <button
             onClick={handleManualCreate}
-            className="group relative w-full flex flex-col items-center gap-3 p-8 rounded-xl border-2 border-zinc-200 hover:border-black hover:bg-zinc-50 transition-all duration-200"
+            disabled={isCreating}
+            className="group relative w-full flex flex-col items-center gap-3 p-8 rounded-xl border-2 border-zinc-200 hover:border-black hover:bg-zinc-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="w-16 h-16 rounded-full bg-zinc-100 group-hover:bg-black group-hover:text-white transition-colors duration-200 flex items-center justify-center">
               <FileText className="w-8 h-8" />
             </div>
             <div className="text-center">
               <h3 className="font-semibold text-xl text-black mb-2">
-                Create Manually
+                {isCreating ? "Creating..." : "Create Manually"}
               </h3>
               <p className="text-sm text-zinc-600">
-                Start from scratch with our intuitive resume builder
+                {isCreating 
+                  ? "Setting up your resume..." 
+                  : "Start from scratch with our intuitive resume builder"}
               </p>
             </div>
           </button>

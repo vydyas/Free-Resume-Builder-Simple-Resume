@@ -198,3 +198,4 @@ export function ReportBugModal({ open, onOpenChange }: ReportBugModalProps) {
     </div>
   );
 }
+

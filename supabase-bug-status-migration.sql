@@ -11,3 +11,4 @@ ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
 --   CHECK (status IN ('open', 'in_progress', 'resolved', 'closed'));
 
 CREATE INDEX IF NOT EXISTS idx_bug_reports_status ON bug_reports(status);
+

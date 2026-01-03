@@ -82,19 +82,19 @@ export default function ReportedBugsPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-10">
         {loading ? (
-          <p className="text-sm text-gray-500">Loading your bug reports...</p>
+          <p className="text-sm sm:text-base text-gray-500">Loading your bug reports...</p>
         ) : bugs.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-8 text-center text-sm text-gray-600">
+          <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-6 sm:p-8 md:p-10 text-center text-sm sm:text-base text-gray-600">
             You haven&apos;t reported any bugs yet.
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4 md:space-y-5">
             {bugs.map((bug) => (
               <div
                 key={bug.id}
-                className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex flex-col gap-3"
+                className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 md:p-6 flex flex-col gap-3 sm:gap-4"
               >
                 <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
@@ -156,3 +156,4 @@ export default function ReportedBugsPage() {
     </div>
   );
 }
+

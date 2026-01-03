@@ -53,38 +53,38 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8">
+    <div className="flex-1 p-4 sm:p-5 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Users</h1>
-        <p className="text-gray-600 mt-1">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Users</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">
           Manage all users in the system
         </p>
       </div>
 
       {/* Search */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-5 md:mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search users by email..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 touch-manipulation"
           />
         </div>
       </div>
 
       {/* Mobile Cards View */}
-      <div className="lg:hidden space-y-4">
+      <div className="lg:hidden space-y-3 sm:space-y-4">
         {filteredUsers.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500">
+          <div className="bg-white rounded-lg border border-gray-200 p-6 sm:p-8 text-center text-sm sm:text-base text-gray-500">
             {searchQuery ? "No users found" : "No users yet"}
           </div>
         ) : (
           filteredUsers.map((user) => (
-            <div key={user.id} className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+            <div key={user.id} className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900">
@@ -200,5 +200,6 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
 
 

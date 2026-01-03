@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@clerk/nextjs";
 import { SharedHeader } from "@/components/shared-header";
 
 const FEATURES = [
@@ -18,6 +19,7 @@ const FEATURES = [
 
 export default function LandingPage() {
   const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [bounceOffset, setBounceOffset] = useState(0);
@@ -73,7 +75,7 @@ export default function LandingPage() {
 
             <div className="mt-8 sm:mt-12">
               <button
-                onClick={() => router.push("/resume-builder")}
+                onClick={() => router.push("/dashboard")}
                 className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-base sm:text-lg font-semibold rounded-full hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105"
               >
                 <span>Start Building</span>
@@ -227,7 +229,7 @@ export default function LandingPage() {
               Join thousands of job seekers who landed their dream roles
             </p>
             <button
-              onClick={() => router.push("/resume-builder")}
+              onClick={() => router.push("/dashboard")}
               className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-xl font-bold rounded-full hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105"
             >
               <span>Get Started Free</span>
@@ -282,6 +284,11 @@ export default function LandingPage() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-3">Product</h4>
                 <div className="flex flex-col gap-2 text-gray-600">
+                  {isLoaded && !isSignedIn && (
+                    <Link href="/review-my-resume" className="hover:text-emerald-500 transition-colors">
+                      Review My Resume
+                    </Link>
+                  )}
                   <Link href="/blog" className="hover:text-emerald-500 transition-colors">
                     Blog
                   </Link>
@@ -340,18 +347,6 @@ export default function LandingPage() {
 
         .animate-scroll-footer {
           animation: scroll-footer 15s linear infinite;
-        }
-
-        .footer-text {
-          transition: all 0.5s ease;
-        }
-
-        .footer-text:hover {
-          text-shadow:
-            0 0 20px rgba(16, 185, 129, 0.8),
-            0 0 40px rgba(16, 185, 129, 0.6),
-            0 0 60px rgba(16, 185, 129, 0.4),
-            0 0 80px rgba(16, 185, 129, 0.3);
         }
 
         .footer-scroll-container:hover .footer-scroll-content {

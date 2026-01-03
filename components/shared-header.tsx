@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { MessageSquare, Bug, LayoutDashboard, FileText } from 'lucide-react';
 import { CreateResumeModal } from './create-resume-modal';
 import { UserMenu } from './user-menu';
 import { FeedbackModal } from './feedback-modal';
@@ -26,10 +27,13 @@ export function SharedHeader({}: SharedHeaderProps) {
 
   return (
     <>
-      <nav className="fixed top-0 w-full bg-gradient-to-r from-white via-emerald-50/30 to-white border-b border-emerald-100/50 z-50 print:hidden backdrop-blur-sm bg-opacity-95">
+      <nav className="fixed top-0 w-full border-b border-emerald-100/50 z-50 print:hidden backdrop-blur-md bg-white/70">
         <div className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity">
+            <Link 
+              href="/" 
+              className="flex items-center space-x-2 hover:opacity-90 transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
+            >
               <span className={`text-2xl sm:text-3xl font-normal`} style={{ fontFamily: 'var(--font-great-vibes), cursive' }}>
                 <span className="text-black">SimpleResu</span>
                 <span className="text-emerald-500">.me</span>
@@ -37,6 +41,35 @@ export function SharedHeader({}: SharedHeaderProps) {
             </Link>
 
             <div className="flex items-center space-x-4">
+              {/* Navigation Links */}
+              {isLoaded && !isSignedIn && (
+                <Link
+                  href="/review-my-resume"
+                  className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-600 hover:text-emerald-600 hover:bg-emerald-50/50 hover:font-semibold transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
+                >
+                  <FileText className="w-4 h-4" />
+                  Review My Resume
+                </Link>
+              )}
+              {isLoaded && isSignedIn && (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-600 hover:text-emerald-600 hover:bg-emerald-50/50 hover:font-semibold transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/review-resume"
+                    className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-600 hover:text-emerald-600 hover:bg-emerald-50/50 hover:font-semibold transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Review Resume
+                  </Link>
+                </>
+              )}
+              
               {/* Auth / user menu */}
               <div className="flex items-center space-x-2 sm:space-x-3">
               {isLoaded && (
@@ -44,7 +77,7 @@ export function SharedHeader({}: SharedHeaderProps) {
                   {!isSignedIn ? (
                     <button
                       onClick={handleSignIn}
-                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-full hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 font-semibold transform hover:scale-105"
+                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-full hover:shadow-lg hover:shadow-emerald-500/30 hover:drop-shadow-[0_0_6px_rgba(16,185,129,0.5)] transition-all duration-300 font-semibold transform hover:scale-105"
                     >
                       Sign In
                     </button>
@@ -55,15 +88,17 @@ export function SharedHeader({}: SharedHeaderProps) {
                         <button
                           type="button"
                           onClick={() => setShowFeedbackModal(true)}
-                          className="hover:text-black transition-colors"
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:text-emerald-600 hover:bg-emerald-50/50 hover:font-semibold transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
                         >
+                          <MessageSquare className="w-4 h-4" />
                           Feedback
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowBugModal(true)}
-                          className="hover:text-black transition-colors"
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:text-emerald-600 hover:bg-emerald-50/50 hover:font-semibold transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
                         >
+                          <Bug className="w-4 h-4" />
                           Report a bug
                         </button>
                       </div>

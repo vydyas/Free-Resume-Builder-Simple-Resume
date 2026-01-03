@@ -27,3 +27,4 @@ CREATE TABLE IF NOT EXISTS bug_reports (
 
 CREATE INDEX IF NOT EXISTS idx_bug_reports_created_at ON bug_reports(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_bug_reports_clerk_user_id ON bug_reports(clerk_user_id);
+

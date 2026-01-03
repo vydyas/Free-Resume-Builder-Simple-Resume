@@ -115,9 +115,10 @@ export function AdminSidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileMenuOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-50"
+        className="lg:hidden fixed top-4 left-5 sm:top-4 sm:left-6 md:top-4 md:left-8 z-50 p-2.5 sm:p-3 bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+        aria-label="Open menu"
       >
-        <Menu className="w-5 h-5 text-gray-700" />
+        <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
       </button>
 
       {/* Mobile Overlay */}
@@ -144,5 +145,6 @@ export function AdminSidebar() {
     </>
   );
 }
+
 
 

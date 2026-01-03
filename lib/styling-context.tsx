@@ -18,7 +18,7 @@ export const FONT_FAMILIES = {
 // Update the type for heading styles
 type HeadingStyle = 'background' | 'border-bottom' | 'border-top';
 
-interface StylingContextType {
+export interface StylingContextType {
   headingFont: keyof typeof FONT_FAMILIES;
   headingColor: string;
   nameFont: keyof typeof FONT_FAMILIES;

@@ -63,11 +63,11 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8">
+    <div className="flex-1 p-4 sm:p-5 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1 text-sm sm:text-base">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-1 text-xs sm:text-sm md:text-base">
           Overview of your admin panel
         </p>
       </div>
@@ -85,8 +85,8 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-5 md:p-6">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-emerald-100 rounded-lg">
                 <Users className="w-6 h-6 text-emerald-600" />
@@ -190,5 +190,6 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
 
 

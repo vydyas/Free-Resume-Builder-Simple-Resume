@@ -32,3 +32,4 @@ export function AdminListShimmer() {
     </div>
   );
 }
+

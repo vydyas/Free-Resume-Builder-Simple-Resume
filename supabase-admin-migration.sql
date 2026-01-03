@@ -13,3 +13,4 @@ CREATE TABLE IF NOT EXISTS admins (
 -- DO NOT commit real credentials to version control.
 -- Example:
 -- INSERT INTO admins (username, password) VALUES ('your_admin', 'your_strong_password');
+
