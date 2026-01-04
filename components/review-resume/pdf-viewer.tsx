@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 
 // Set up PDF.js worker
@@ -18,7 +17,7 @@ export function PDFViewer({ pdfUrl }: PDFViewerProps) {
   const [error, setError] = useState<string | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
-  const [pdfDoc, setPdfDoc] = useState<any>(null);
+  const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +54,11 @@ export function PDFViewer({ pdfUrl }: PDFViewerProps) {
         if (!canvas) return;
 
         const context = canvas.getContext("2d");
+        if (!context) {
+          console.error("Failed to get 2D context");
+          return;
+        }
+        
         const viewport = page.getViewport({ scale: 1.5 });
         
         canvas.height = viewport.height;
@@ -63,6 +67,7 @@ export function PDFViewer({ pdfUrl }: PDFViewerProps) {
         const renderContext = {
           canvasContext: context,
           viewport: viewport,
+          canvas: canvas,
         };
 
         await page.render(renderContext).promise;

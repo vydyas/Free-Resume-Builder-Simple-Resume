@@ -1,10 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import Settings from 'lucide-react/dist/esm/icons/settings';
 import Minus from 'lucide-react/dist/esm/icons/minus';
 import Plus from 'lucide-react/dist/esm/icons/plus';
-import { GlobalSettings } from './global-settings';
 import { RippleButton } from './ui/ripple-button';
 import { fireConfetti } from '@/lib/confetti';
 import { trackEvents } from '@/lib/analytics';
@@ -31,12 +29,8 @@ export function FloatingControls({
 }: FloatingControlsProps) {
   const { isSignedIn } = useAuth();
   const router = useRouter();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const settingsButtonRef = useRef<HTMLButtonElement>(null);
-  const settingsDropdownRef = useRef<HTMLDivElement>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
 
   // Handle scroll effect
   useEffect(() => {
@@ -45,32 +39,6 @@ export function FloatingControls({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle dropdown position
-  useEffect(() => {
-    if (isSettingsOpen && settingsButtonRef.current && settingsDropdownRef.current) {
-      const buttonRect = settingsButtonRef.current.getBoundingClientRect();
-      const dropdownHeight = settingsDropdownRef.current.offsetHeight;
-      setDropdownPosition(
-        window.innerHeight - buttonRect.bottom < dropdownHeight ? 'top' : 'bottom'
-      );
-    }
-  }, [isSettingsOpen]);
-
-  // Handle click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isSettingsOpen &&
-        !settingsButtonRef.current?.contains(event.target as Node) &&
-        !settingsDropdownRef.current?.contains(event.target as Node)
-      ) {
-        setIsSettingsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isSettingsOpen]);
 
   const handleZoomIn = () => {
     if (zoom < 110) {
@@ -122,10 +90,6 @@ export function FloatingControls({
     }
   };
 
-  const handleSettingsClick = () => {
-    trackEvents.settingsOpened();
-    setIsSettingsOpen(!isSettingsOpen);
-  };
 
   return (
     <>
@@ -180,40 +144,6 @@ export function FloatingControls({
           >
             <Download className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
           </RippleButton>
-
-          <Separator orientation="vertical" className="h-5 sm:h-6" />
-
-          {/* Settings Button */}
-          <div className="relative">
-            <Button
-              ref={settingsButtonRef}
-              variant="ghost"
-              size="icon"
-              onClick={handleSettingsClick}
-              aria-label="Open Settings Menu"
-              aria-expanded={isSettingsOpen}
-              aria-haspopup="dialog"
-              className="w-7 h-7 sm:w-8 sm:h-8"
-            >
-              <Settings className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
-            </Button>
-
-            {isSettingsOpen && (
-              <div
-                ref={settingsDropdownRef}
-                className={`absolute z-50 right-0 bg-white dark:bg-gray-900 rounded-lg shadow-xl border
-                  ${dropdownPosition === 'bottom' ? 'mt-2 top-full' : 'mb-2 bottom-full'}`}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Settings Panel"
-              >
-                <GlobalSettings
-                  onClose={() => setIsSettingsOpen(false)}
-                  key={isSettingsOpen ? 'open' : 'closed'}
-                />
-              </div>
-            )}
-          </div>
         </div>
       </nav>
 

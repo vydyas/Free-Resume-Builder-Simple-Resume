@@ -18,18 +18,25 @@ interface ClientRightSidebarProps {
   config: ResumeConfig;
   onConfigChange: (key: keyof ResumeConfig, value: boolean) => void;
   userData: UserData;
-  onUserDataChange: (data: Partial<ClientRightSidebarProps['userData']>) => void;
+  onUserDataChange: (data: Partial<ClientRightSidebarProps['userData']>) => Promise<void>;
   onLinkedInImport?: () => void;
-  zoom: number;
-  onZoomChange: (zoom: number) => void;
   isMobile?: boolean;
+  resumeName?: string;
+  resumeId?: string;
+  onResumeNameChange?: (name: string) => Promise<void>;
 }
 
 export function ClientRightSidebar(props: ClientRightSidebarProps) {
+  const { resumeName, resumeId, onResumeNameChange, ...sidebarProps } = props;
   return (
     <div className="h-full">
       <Suspense fallback={<RightSidebarPlaceholder />}>
-        <RightSidebar {...props} />
+        <RightSidebar 
+          {...sidebarProps}
+          resumeName={resumeName}
+          resumeId={resumeId}
+          onResumeNameChange={onResumeNameChange}
+        />
       </Suspense>
     </div>
   );

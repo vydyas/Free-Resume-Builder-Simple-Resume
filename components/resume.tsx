@@ -8,10 +8,7 @@ import React, {
   useState,
   useImperativeHandle,
 } from "react";
-import { DragEndEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 import "../app/custom-styles.css";
-import { Check } from "lucide-react";
 import FancyHeading from "./fancy-heading";
 import { useStyling } from "@/lib/styling-context";
 import { ResumeShimmer } from "./resume-shimmer";
@@ -63,10 +60,10 @@ export const Resume = forwardRef<ResumeRef, ResumeProps>(
     const resumeContainerRef = useRef<HTMLDivElement>(null);
     const [isClient, setIsClient] = useState(false);
     const [lines, setLines] = useState<LineItem[]>([]);
-    const [showSaveIndicator, setShowSaveIndicator] = useState(false);
+    const hasLoadedRef = useRef(false);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-    const { nameFont, nameColor, borderColor, skillsStyle, resumeBackgroundColor } = useStyling();
+    const { nameFont, nameColor, borderColor, skillsStyle, resumeBackgroundColor, headingColor, companyColor } = useStyling();
 
     useImperativeHandle(ref, () => ({
       downloadPDF: async () => {
@@ -76,87 +73,121 @@ export const Resume = forwardRef<ResumeRef, ResumeProps>(
 
     const generateLines = useCallback(() => {
       console.log("Generating lines for:", userData, config);
-      const newLines: LineItem[] = [];
 
-      // Header section
-      newLines.push({
-        id: `line-${newLines.length}`,
-        content: (
-          <Header 
-            userData={userData}
-            nameFont={nameFont}
-            nameColor={nameColor}
-          />
-        ),
-        type: "header",
-        section: "header",
-      });
+      // Get section order from localStorage
+      let sectionOrder: string[] = [];
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("resumeSectionOrder");
+        if (stored) {
+          try {
+            sectionOrder = JSON.parse(stored);
+          } catch (e) {
+            console.error("Failed to parse resumeSectionOrder", e);
+          }
+        }
+      }
+
+      // Default order if not found
+      if (sectionOrder.length === 0) {
+        sectionOrder = [
+          "personal-info",
+          "summary",
+          "experience",
+          "education",
+          "skills",
+          "projects",
+          "certifications",
+        ];
+        // Add custom sections
+        userData.customSections?.forEach((section) => {
+          sectionOrder.push(section.id);
+        });
+      }
+
+      // Build section data map
+      const sectionDataMap: Record<string, LineItem> = {};
+
+      // Header section (Personal Info) - only show if config.showPhoto is true
+      if (config.showPhoto) {
+        sectionDataMap["personal-info"] = {
+          id: "line-header",
+          content: (
+            <Header 
+              userData={userData}
+              nameFont={nameFont}
+              nameColor={nameColor}
+            />
+          ),
+          type: "header",
+          section: "header",
+        };
+      }
 
       // Summary section
       if (config.showSummary && userData.summary) {
-        newLines.push({
-          id: `line-${newLines.length}`,
+        sectionDataMap["summary"] = {
+          id: "line-summary",
           content: <Summary summary={userData.summary} />,
           type: "summary",
           section: "summary",
-        });
+        };
       }
 
       // Experience section
       if (config.showExperience && userData.positions?.length > 0) {
-        newLines.push({
-          id: `line-${newLines.length}`,
+        sectionDataMap["experience"] = {
+          id: "line-positions",
           content: <Experience positions={userData.positions} />,
           type: "positions",
           section: "positions",
-        });
+        };
       }
 
       // Education section
       if (config.showEducation && userData.educations?.length > 0) {
-        newLines.push({
-          id: `line-${newLines.length}`,
+        sectionDataMap["education"] = {
+          id: "line-education",
           content: <Education educations={userData.educations} />,
           type: "education",
           section: "education",
-        });
+        };
       }
 
       // Skills section
       if (config.showSkills && userData.skills?.length > 0) {
-        newLines.push({
-          id: `line-${newLines.length}`,
+        sectionDataMap["skills"] = {
+          id: "line-skills",
           content: <Skills skills={userData.skills} style={skillsStyle} />,
           type: "skills",
           section: "skills",
-        });
+        };
       }
 
       // Projects section
       if (config.showProjects && userData.projects?.length > 0) {
-        newLines.push({
-          id: `line-${newLines.length}`,
+        sectionDataMap["projects"] = {
+          id: "line-projects",
           content: <Projects projects={userData.projects} />,
           type: "projects",
           section: "projects",
-        });
+        };
       }
 
-      // Add Certifications section
-      if (config.showCertifications) {
-        newLines.push({
-          id: `line-${newLines.length}`,
+      // Certifications section
+      if (config.showCertifications && (userData.certifications?.length ?? 0) > 0) {
+        sectionDataMap["certifications"] = {
+          id: "line-certifications",
           content: <Certifications certifications={userData.certifications} />,
           type: "certifications",
           section: "certifications",
-        });
+        };
       }
 
       // Custom sections
       userData.customSections?.forEach((section) => {
         if (section.isVisible) {
-          newLines.push({
-            id: `line-${newLines.length}`,
+          sectionDataMap[section.id] = {
+            id: `line-${section.id}`,
             content: (
               <div>
                 <FancyHeading>{section.title}</FancyHeading>
@@ -168,61 +199,29 @@ export const Resume = forwardRef<ResumeRef, ResumeProps>(
             ),
             type: "custom",
             section: section.id,
-          });
+          };
+        }
+      });
+
+      // Build ordered lines array based on sectionOrder
+      const newLines: LineItem[] = [];
+      sectionOrder.forEach((sectionId) => {
+        const sectionData = sectionDataMap[sectionId];
+        if (sectionData) {
+          newLines.push(sectionData);
+        }
+      });
+
+      // Add any sections that weren't in the order (shouldn't happen, but safety check)
+      Object.keys(sectionDataMap).forEach((sectionId) => {
+        if (!sectionOrder.includes(sectionId)) {
+          newLines.push(sectionDataMap[sectionId]);
         }
       });
 
       return newLines;
     }, [userData, config, nameColor, nameFont, skillsStyle]);
 
-    const handleDragEnd = useCallback(
-      (event: DragEndEvent) => {
-        const { active, over } = event;
-
-        if (active.id !== over?.id) {
-          setLines((items) => {
-            const oldIndex = items.findIndex((item) => item.id === active.id);
-            const newIndex = items.findIndex((item) => item.id === over?.id);
-            const newItems = arrayMove(items, oldIndex, newIndex);
-            // Save the new order to localStorage
-            const lineOrder = newItems.map((item) => item.id);
-            localStorage.setItem("resumeLineOrder", JSON.stringify(lineOrder));
-            setShowSaveIndicator(true); // Show save indicator
-            setTimeout(() => setShowSaveIndicator(false), 2000); // Hide after 2 seconds
-            return newItems;
-          });
-        }
-      },
-      [setShowSaveIndicator]
-    );
-
-    const applyStoredLineOrder = useCallback((generatedLines: LineItem[]) => {
-      try {
-        const savedOrder = localStorage.getItem("resumeLineOrder");
-        if (savedOrder) {
-          const orderArray = JSON.parse(savedOrder);
-          // Create a map of id to line item for efficient lookup
-          const lineMap = new Map(
-            generatedLines.map((line: LineItem) => [line.id, line])
-          );
-          // Reconstruct lines array based on saved order
-          const orderedLines = orderArray
-            .map((id: string) => lineMap.get(id))
-            .filter(
-              (line: LineItem | undefined): line is LineItem =>
-                line !== undefined
-            );
-          // Add any new lines that weren't in the saved order
-          const newLines = generatedLines.filter(
-            (line: LineItem) => !orderArray.includes(line.id)
-          );
-          return [...orderedLines, ...newLines];
-        }
-      } catch (error) {
-        console.error("Error loading line order:", error);
-      }
-      return generatedLines;
-    }, []);
 
     useEffect(() => {
       setIsClient(true);
@@ -231,24 +230,54 @@ export const Resume = forwardRef<ResumeRef, ResumeProps>(
     useEffect(() => {
       if (isClient) {
         const lines = generateLines();
-        const orderedLines = applyStoredLineOrder(lines);
-        setLines(orderedLines);
+        setLines(lines);
+        // Mark as loaded once we have lines (only once, even if component remounts)
+        if (!hasLoadedRef.current && lines.length > 0) {
+          hasLoadedRef.current = true;
+          setIsFirstLoad(false);
+        } else if (hasLoadedRef.current) {
+          // If we've already loaded before, don't show shimmer on remount
+          setIsFirstLoad(false);
+        }
       }
-    }, [isClient, generateLines, applyStoredLineOrder]);
+    }, [isClient, generateLines]);
 
     useEffect(() => {
+      // Update lines when data changes, but don't reset isFirstLoad
       const lines = generateLines();
-      const orderedLines = applyStoredLineOrder(lines);
-      setLines(orderedLines);
-    }, [userData, config, githubId, generateLines, applyStoredLineOrder, nameColor]);
+      setLines(lines);
+    }, [userData, config, githubId, generateLines, nameColor, headingColor, borderColor, companyColor, resumeBackgroundColor]);
 
+    // Listen for changes to section order in localStorage
     useEffect(() => {
-      if (isFirstLoad) {
-        setIsFirstLoad(false);
-      }
-    }, [isFirstLoad]);
+      if (!isClient) return;
 
-    if (isFirstLoad) {
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === "resumeSectionOrder") {
+          const lines = generateLines();
+          setLines(lines);
+        }
+      };
+
+      // Listen for storage events (from other tabs/windows)
+      window.addEventListener("storage", handleStorageChange);
+
+      // Also listen for custom events (from same tab)
+      const handleCustomStorageChange = () => {
+        const lines = generateLines();
+        setLines(lines);
+      };
+
+      window.addEventListener("resumeSectionOrderChanged", handleCustomStorageChange);
+
+      return () => {
+        window.removeEventListener("storage", handleStorageChange);
+        window.removeEventListener("resumeSectionOrderChanged", handleCustomStorageChange);
+      };
+    }, [isClient, generateLines]);
+
+    // Show shimmer only on true first load (when we haven't loaded yet and lines are empty)
+    if (isFirstLoad && !hasLoadedRef.current && lines.length === 0) {
       return <ResumeShimmer />;
     }
 
@@ -329,19 +358,12 @@ export const Resume = forwardRef<ResumeRef, ResumeProps>(
         </div> */}
         <TemplateComponent
           lines={lines}
-          onDragEnd={handleDragEnd}
           resumeRef={resumeContainerRef}
           wrapperClass={wrapperClass}
           borderColor={borderColor}
           zoomStyle={zoomStyle}
           resumeBackgroundColor={resumeBackgroundColor}
         />
-        {showSaveIndicator && (
-          <div className="fixed top-0 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-md transition-opacity shadow-sm z-50">
-            <Check className="w-4 h-4" />
-            <span className="text-sm">Saved</span>
-          </div>
-        )}
       </div>
     );
   }

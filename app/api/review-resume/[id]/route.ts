@@ -112,7 +112,7 @@ export async function DELETE(
         console.log("[ReviewResume] Extracted file path:", filePath);
         console.log("[ReviewResume] Original PDF URL:", review.pdf_url);
         
-        const { error: storageError, data } = await supabaseAdmin.storage
+        const { error: storageError } = await supabaseAdmin.storage
           .from("resume-reviews")
           .remove([filePath]);
         

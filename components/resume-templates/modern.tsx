@@ -1,12 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { DraggableLine } from "../draggable-line";
 import { LineItem } from "@/types/resume";
 
 interface ModernTemplateProps {
   lines: LineItem[];
-  onDragEnd: (event: DragEndEvent) => void;
   resumeRef: React.RefObject<HTMLDivElement>;
   wrapperClass: string;
   borderColor: string;
@@ -16,7 +12,6 @@ interface ModernTemplateProps {
 
 export function ModernTemplate({
   lines,
-  onDragEnd,
   resumeRef,
   wrapperClass,
   borderColor,
@@ -40,23 +35,17 @@ export function ModernTemplate({
             
             {/* Main content */}
             <div className="py-6 pr-6">
-              <DndContext onDragEnd={onDragEnd}>
-                <SortableContext
-                  items={lines.map((item) => item.id)}
-                  strategy={verticalListSortingStrategy}
+              {lines.map((line) => (
+                <div
+                  key={line.id}
+                  className={`
+                    ${line.type === 'header' ? 'col-span-2 text-center mb-6' : ''}
+                    ${line.type === 'skills' ? 'mt-4' : ''}
+                  `}
                 >
-                  {lines.map((line) => (
-                    <DraggableLine key={line.id} id={line.id}>
-                      <div className={`
-                        ${line.type === 'header' ? 'col-span-2 text-center mb-6' : ''}
-                        ${line.type === 'skills' ? 'mt-4' : ''}
-                      `}>
-                        {line.content}
-                      </div>
-                    </DraggableLine>
-                  ))}
-                </SortableContext>
-              </DndContext>
+                  {line.content}
+                </div>
+              ))}
             </div>
           </div>
         </Card>

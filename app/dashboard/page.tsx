@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { SharedHeader } from "@/components/shared-header";
-import { Plus, FileText, Trash2, Edit, Grid3x3, List, ArrowUpDown, MoreVertical, MessageSquare } from "lucide-react";
+import { Plus, FileText, Trash2, Edit, Grid3x3, List, ArrowUpDown, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -252,14 +252,6 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Button
-                onClick={() => router.push("/review-resume")}
-                variant="outline"
-                className="border-emerald-500 text-emerald-600 hover:bg-emerald-50"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Review Resume
-              </Button>
               {/* Sort Filter */}
               <Select value={sortBy} onValueChange={(value) => setSortBy(value as typeof sortBy)}>
                 <SelectTrigger className="w-[180px] h-9 border-gray-300 bg-white">
@@ -352,7 +344,7 @@ export default function DashboardPage() {
                         </p>
                       )}
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0">
+                    <div className="ml-2 flex-shrink-0">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button
@@ -374,6 +366,7 @@ export default function DashboardPage() {
                             <Edit className="w-4 h-4" />
                             Edit Name
                           </DropdownMenuItem>
+                          <div className="h-px bg-gray-200 my-1" />
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
@@ -396,75 +389,118 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="space-y-3">
-              {sortedResumes.map((resume) => (
-                <div
-                  key={resume.id}
-                  onClick={() => router.push(`/resume-builder/${resume.id}`)}
-                  className="group relative bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-emerald-500 hover:shadow-md hover:drop-shadow-[0_0_12px_rgba(16,185,129,0.4)] transition-all duration-300 cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-4">
-                        <div className="flex-shrink-0">
-                          <FileText className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+            <div className="bg-white rounded-lg overflow-hidden">
+              {/* Table Header */}
+              <div className="bg-gray-50 border-b border-gray-200 px-6 py-3">
+                <div className="grid grid-cols-12 gap-4 items-center">
+                  <div className="col-span-5">
+                    <span className="text-sm font-medium text-gray-700">Title</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-sm font-medium text-gray-700">Name</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-sm font-medium text-gray-700">Created</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-sm font-medium text-gray-700">Updated</span>
+                  </div>
+                  <div className="col-span-1"></div>
+                </div>
+              </div>
+              
+              {/* Table Rows */}
+              <div>
+                {sortedResumes.map((resume) => {
+                  const firstLetter = resume.name.charAt(0).toUpperCase();
+                  const initials = resume.first_name && resume.last_name 
+                    ? `${resume.first_name.charAt(0)}${resume.last_name.charAt(0)}`.toUpperCase()
+                    : firstLetter;
+                  
+                  return (
+                    <div
+                      key={resume.id}
+                      onClick={() => router.push(`/resume-builder/${resume.id}`)}
+                      className="group px-6 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-150 cursor-pointer last:border-b-0"
+                    >
+                      <div className="grid grid-cols-12 gap-4 items-center">
+                        {/* Title with Icon */}
+                        <div className="col-span-5 flex items-center gap-3 min-w-0">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-semibold text-sm">
+                            {initials}
+                          </div>
+                          <span className="text-sm font-medium text-gray-900 truncate">
                             {resume.name}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            {(resume.first_name || resume.last_name) && (
-                              <span className="truncate">
-                                {[resume.first_name, resume.last_name]
-                                  .filter(Boolean)
-                                  .join(" ")}
-                              </span>
-                            )}
-                            <span className="text-gray-400">•</span>
-                            <span>Updated {formatDate(resume.updated_at)}</span>
+                          </span>
+                        </div>
+                        
+                        {/* Name */}
+                        <div className="col-span-2">
+                          <span className="text-sm text-gray-600 truncate block">
+                            {resume.first_name && resume.last_name
+                              ? `${resume.first_name} ${resume.last_name}`
+                              : resume.first_name || resume.last_name || "-"}
+                          </span>
+                        </div>
+                        
+                        {/* Created Date */}
+                        <div className="col-span-2">
+                          <span className="text-sm text-gray-600">
+                            {formatDate(resume.created_at)}
+                          </span>
+                        </div>
+                        
+                        {/* Updated Date */}
+                        <div className="col-span-2">
+                          <span className="text-sm text-gray-600">
+                            {formatDate(resume.updated_at)}
+                          </span>
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="col-span-1 flex justify-end">
+                          <div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="p-2 hover:bg-gray-200 rounded-lg transition-all text-gray-600 hover:text-gray-900"
+                                  aria-label="Resume options"
+                                >
+                                  <MoreVertical className="w-4 h-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40">
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditClick(resume, e);
+                                  }}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                  Edit Name
+                                </DropdownMenuItem>
+                                <div className="h-px bg-gray-200 my-1" />
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteResume(resume.id, e);
+                                  }}
+                                  className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            onClick={(e) => e.stopPropagation()}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-600 hover:text-gray-900"
-                            aria-label="Resume options"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditClick(resume, e);
-                            }}
-                            className="flex items-center gap-2 cursor-pointer"
-                          >
-                            <Edit className="w-4 h-4" />
-                            Edit Name
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteResume(resume.id, e);
-                            }}
-                            className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

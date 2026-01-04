@@ -1,4 +1,5 @@
 export interface ResumeConfig {
+  showPhoto: boolean;
   showSummary: boolean;
   showExperience: boolean;
   showEducation: boolean;

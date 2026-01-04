@@ -1,15 +1,20 @@
 "use client";
 
 import React from 'react';
-import { X } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useStyling } from "@/lib/styling-context";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { HeadingStyle } from '@/types/resume';
 
+interface UserData {
+  skills?: Array<{
+    name: string;
+  }>;
+}
+
 interface GlobalSettingsProps {
   onClose?: () => void;
+  userData?: UserData;
 }
 
 interface ThemeColor {
@@ -67,7 +72,7 @@ const ColorPicker = ({ label, value, onChange }: {
   </div>
 );
 
-export function GlobalSettings({ onClose }: GlobalSettingsProps) {
+export function GlobalSettings({ userData }: GlobalSettingsProps) {
   const { 
     headingColor, 
     updateHeadingColor,
@@ -85,7 +90,11 @@ export function GlobalSettings({ onClose }: GlobalSettingsProps) {
     updateCompanyColor,
   } = useStyling();
 
+  // Check if there are skills in the resume
+  const hasSkills = userData?.skills && userData.skills.length > 0;
+
   const applyThemeColors = (theme: ThemeColor) => {
+    // Apply all colors in sequence to ensure they're all updated
     updateNameColor(theme.nameColor);
     updateHeadingColor(theme.headingColor);
     setBorderColor(theme.borderColor);
@@ -93,20 +102,11 @@ export function GlobalSettings({ onClose }: GlobalSettingsProps) {
   };
 
   return (
-    <div className="relative inline-block">
-      <div className="w-72 bg-white rounded-lg shadow-xl border p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Settings</h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="space-y-4">
-          {/* Theme Colors */}
-          <div className="space-y-2">
-            <Label>Theme Colors</Label>
-            <div className="flex gap-2">
+    <div className="w-full space-y-4">
+      {/* Theme Colors */}
+      <div className="space-y-2">
+        <Label>Theme Colors</Label>
+        <div className="flex gap-2">
               {themeColors.map((theme) => (
                 <button
                   key={theme.name}
@@ -124,10 +124,10 @@ export function GlobalSettings({ onClose }: GlobalSettingsProps) {
             </div>
           </div>
 
-          {/* Colors */}
-          <div className="space-y-4">
-            <Label className="text-sm font-medium">Colors</Label>
-            <div className="space-y-3">
+      {/* Colors */}
+      <div className="space-y-4">
+        <Label className="text-sm font-medium">Colors</Label>
+        <div className="space-y-3">
               <ColorPicker
                 label="Name Color"
                 value={nameColor}
@@ -161,48 +161,49 @@ export function GlobalSettings({ onClose }: GlobalSettingsProps) {
             </div>
           </div>
 
-          {/* Styles */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Skills Style</Label>
-              <RadioGroup
-                value={skillsStyle}
-                onValueChange={(value) => setSkillsStyle(value as 'chips' | 'list')}
-                className="flex flex-col space-y-1"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="chips" id="chips" />
-                  <Label htmlFor="chips">Chips</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="list" id="list" />
-                  <Label htmlFor="list">List</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Heading Style</Label>
-              <RadioGroup
-                value={headingStyle}
-                onValueChange={(value) => setHeadingStyle(value as HeadingStyle)}
-                className="flex flex-col space-y-1"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="background" id="background" />
-                  <Label htmlFor="background">Background</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="border-bottom" id="border-bottom" />
-                  <Label htmlFor="border-bottom">Bottom Border</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="border-top" id="border-top" />
-                  <Label htmlFor="border-top">Top Border</Label>
-                </div>
-              </RadioGroup>
-            </div>
+      {/* Styles */}
+      <div className="space-y-4">
+        {/* Skills Style - Only show when there are skills */}
+        {hasSkills && (
+          <div className="space-y-2">
+            <Label>Skills Style</Label>
+            <RadioGroup
+              value={skillsStyle}
+              onValueChange={(value) => setSkillsStyle(value as 'chips' | 'list')}
+              className="flex flex-col space-y-1"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="chips" id="chips" />
+                <Label htmlFor="chips">Chips</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="list" id="list" />
+                <Label htmlFor="list">List</Label>
+              </div>
+            </RadioGroup>
           </div>
+        )}
+
+        <div className="space-y-2">
+          <Label>Heading Style</Label>
+          <RadioGroup
+            value={headingStyle}
+            onValueChange={(value) => setHeadingStyle(value as HeadingStyle)}
+            className="flex flex-col space-y-1"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="background" id="background" />
+              <Label htmlFor="background">Background</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="border-bottom" id="border-bottom" />
+              <Label htmlFor="border-bottom">Bottom Border</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="border-top" id="border-top" />
+              <Label htmlFor="border-top">Top Border</Label>
+            </div>
+          </RadioGroup>
         </div>
       </div>
     </div>

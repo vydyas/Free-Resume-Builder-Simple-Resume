@@ -52,7 +52,7 @@ export default function ReviewMyResumePage() {
     if (file && file.type === "application/pdf") {
       handleFileUpload(file);
     }
-  }, [isLoaded, isSignedIn, handleFileUpload]);
+  }, [isLoaded, isSignedIn, handleFileUpload, router]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -84,6 +84,21 @@ body {
   min-height: 100vh;
 }
 
+/* Lightest green animated border */
+@keyframes subtle-border {
+  0%, 100% {
+    border-color: rgba(187, 247, 208, 0.4);
+  }
+  50% {
+    border-color: rgba(187, 247, 208, 0.6);
+  }
+}
+
+.animated-green-border {
+  border: 1px solid rgba(187, 247, 208, 0.4);
+  animation: subtle-border 3s ease-in-out infinite;
+}
+
 * {
   scrollbar-width: none; /* Firefox */
   scrollbar-color: rgb(150 150 150 / 20%) transparent; /* Firefox */
@@ -142,26 +157,103 @@ ol {
 
 /* Add these print styles */
 @media print {
-  /* Hide everything first */
-  body * {
-    visibility: hidden;
-  }
-
-  /* Show only resume content */
-  .resume-container,
-  .resume-container * {
-    visibility: visible;
-  }
-
-  .resume-container {
-    width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
+  /* Reset body and html */
+  html,
+  body {
     margin: 0 !important;
     padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Hide all non-resume UI elements explicitly */
+  header,
+  nav,
+  .floating-controls,
+  .resize-handle,
+  .right-sidebar,
+  .nextjs-toast,
+  .company-badges,
+  [class*="PanelResizeHandle"],
+  .shared-header,
+  .no-print-sidebar,
+  .no-print-settings,
+  .no-print-controls {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide mobile/tablet layout section completely */
+  div[class*="lg:hidden"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide all h2 elements that are not in resume */
+  h2:not(.resume-container h2):not(.resume-container *) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide buttons that are not in resume */
+  button:not(.resume-container button):not(.resume-container *) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Only show content inside print-resume-wrapper and resume-container */
+  body > *:not(.print-resume-wrapper):not(.resume-container) {
+    /* Hide everything except resume */
+  }
+
+  /* Specifically hide the main page wrapper content except resume */
+  div.flex.flex-col.bg-white.h-screen > *:not(.print-resume-wrapper):not(.resume-container) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide sidebar, settings panel, and controls using specific classes */
+  .no-print-sidebar,
+  .no-print-settings,
+  .no-print-controls {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Make the preview container full width for printing */
+  div[class*="w-[80%]"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Show resume container and its contents - maintain A4 format for desktop */
+  .resume-container {
+    width: 220mm !important;
+    max-width: 220mm !important;
+    height: auto !important;
+    min-height: 297mm !important;
+    overflow: visible !important;
+    position: relative !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+    background: white !important;
+  }
+
+  .print-resume-wrapper {
+    position: relative !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    background: white !important;
+  }
+
+  /* Ensure resume template content is visible */
+  .resume-container > * {
+    width: 100% !important;
   }
 
   /* Reset resume content styles for printing */
@@ -189,6 +281,14 @@ ol {
     visibility: hidden !important;
   }
 
+  /* Hide sidebar, settings panel, and controls using specific classes */
+  .no-print-sidebar,
+  .no-print-settings,
+  .no-print-controls {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
   /* Hide mobile preview modal header and controls */
   .fixed.inset-0.z-50 > div:first-child,
   button[aria-label*="close"],
@@ -207,18 +307,19 @@ ol {
     overflow: visible !important;
   }
 
-  /* Desktop print - show resume panel */
-  .print-resume-wrapper,
-  .print-resume-wrapper * {
-    visibility: visible !important;
+  /* Make the preview container full width for printing */
+  div[class*="w-[80%]"] {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
-  .print-resume-wrapper {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    padding: 0 !important;
+  /* Ensure flex containers don't hide content */
+  div[class*="flex"] {
+    display: flex !important;
+  }
+
+  div[class*="flex-col"] {
+    flex-direction: column !important;
   }
 
   /* Reset any zoom transforms */
@@ -226,10 +327,10 @@ ol {
     transform: none !important;
   }
 
-  /* Update page settings */
+  /* Update page settings - A4 format */
   @page {
     margin: 0;
-    /* size: 220mm 297mm; */
+    size: A4;
     background-color: white;
   }
 

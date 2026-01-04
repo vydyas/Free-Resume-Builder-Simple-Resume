@@ -9,6 +9,12 @@ import { CreateResumeModal } from './create-resume-modal';
 import { UserMenu } from './user-menu';
 import { FeedbackModal } from './feedback-modal';
 import { ReportBugModal } from './report-bug-modal';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface SharedHeaderProps {
   variant?: 'landing' | 'builder';
@@ -27,7 +33,7 @@ export function SharedHeader({}: SharedHeaderProps) {
 
   return (
     <>
-      <nav className="fixed top-0 w-full border-b border-emerald-100/50 z-50 print:hidden backdrop-blur-md bg-white/70">
+      <nav className="fixed top-0 w-full z-50 print:hidden bg-transparent">
         <div className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link 
@@ -84,23 +90,35 @@ export function SharedHeader({}: SharedHeaderProps) {
                   ) : (
                     <>
                       {/* Primary actions - only show when signed in */}
-                      <div className="hidden sm:flex items-center space-x-3 text-sm text-zinc-600">
-                        <button
-                          type="button"
-                          onClick={() => setShowFeedbackModal(true)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:text-emerald-600 hover:bg-emerald-50/50 hover:font-semibold transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
-                        >
-                          <MessageSquare className="w-4 h-4" />
-                          Feedback
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowBugModal(true)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:text-emerald-600 hover:bg-emerald-50/50 hover:font-semibold transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]"
-                        >
-                          <Bug className="w-4 h-4" />
-                          Report a bug
-                        </button>
+                      <div className="hidden sm:flex items-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              className="flex items-center justify-center w-9 h-9 rounded-lg hover:text-emerald-600 hover:bg-emerald-50/50 transition-all duration-300 hover:drop-shadow-[0_0_4px_rgba(16,185,129,0.4)] text-zinc-600"
+                              aria-label="Feedback and bug report menu"
+                            >
+                              <Bug className="w-5 h-5" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem
+                              onClick={() => setShowBugModal(true)}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Bug className="w-4 h-4" />
+                              <span>Report a bug</span>
+                            </DropdownMenuItem>
+                            <div className="h-px bg-gray-200 my-1" />
+                            <DropdownMenuItem
+                              onClick={() => setShowFeedbackModal(true)}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                              <span>Feedback</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <UserMenu />
                     </>
