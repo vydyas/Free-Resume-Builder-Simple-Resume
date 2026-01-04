@@ -3,6 +3,8 @@ import { requireAuth } from '../lib/auth';
 import { supabaseAdmin } from '../lib/supabase-server';
 import { errorResponse, ApiError } from '../lib/errors';
 import { createResumeSchema } from '../lib/validation';
+import { defaultResumeContent } from '@/data/default-resume-content';
+import { defaultConfig } from '@/lib/resume-config';
 
 /**
  * @openapi
@@ -199,29 +201,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Merge provided data with default content (provided data takes precedence)
+    // For arrays, use defaults only if not provided or empty
+    const resumeData = {
+      first_name: validatedData.firstName ?? defaultResumeContent.firstName,
+      last_name: validatedData.lastName ?? defaultResumeContent.lastName,
+      email: validatedData.email ?? defaultResumeContent.email,
+      headline: validatedData.headline ?? defaultResumeContent.headline,
+      summary: validatedData.summary ?? defaultResumeContent.summary,
+      location: validatedData.location ?? defaultResumeContent.location,
+      phone_number: validatedData.phoneNumber ?? defaultResumeContent.phoneNumber,
+      linkedin_id: validatedData.linkedinId ?? defaultResumeContent.linkedinId,
+      github_id: validatedData.githubId ?? defaultResumeContent.githubId,
+      positions: (validatedData.positions && validatedData.positions.length > 0) 
+        ? validatedData.positions 
+        : defaultResumeContent.positions,
+      educations: (validatedData.educations && validatedData.educations.length > 0)
+        ? validatedData.educations
+        : defaultResumeContent.educations,
+      skills: (validatedData.skills && validatedData.skills.length > 0)
+        ? validatedData.skills
+        : defaultResumeContent.skills,
+      projects: validatedData.projects ?? defaultResumeContent.projects,
+      certifications: (validatedData.certifications && validatedData.certifications.length > 0)
+        ? validatedData.certifications
+        : defaultResumeContent.certifications,
+      custom_sections: validatedData.customSections ?? defaultResumeContent.customSections,
+    };
+
     const { data, error } = await supabaseAdmin
       .from('resumes')
       .insert({
         user_id: user.id,
         name: validatedData.name || 'My Resume',
-        first_name: validatedData.firstName,
-        last_name: validatedData.lastName,
-        email: validatedData.email,
-        headline: validatedData.headline,
-        summary: validatedData.summary,
-        location: validatedData.location,
-        phone_number: validatedData.phoneNumber,
-        linkedin_id: validatedData.linkedinId,
-        github_id: validatedData.githubId,
-        positions: validatedData.positions || [],
-        educations: validatedData.educations || [],
-        skills: validatedData.skills || [],
-        projects: validatedData.projects || [],
-        certifications: validatedData.certifications || [],
-        custom_sections: validatedData.customSections || [],
-        config: validatedData.config,
-        template: validatedData.template,
-        zoom: validatedData.zoom,
+        ...resumeData,
+        config: validatedData.config ?? defaultConfig,
+        template: validatedData.template ?? 'default',
+        zoom: validatedData.zoom ?? 100,
       })
       .select()
       .single();

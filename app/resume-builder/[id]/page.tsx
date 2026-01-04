@@ -90,6 +90,7 @@ export default function ResumeBuilderPage() {
   const params = useParams();
   const resumeId = (params?.id as string) || "default";
   const [loading, setLoading] = useState(true);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const [activeTemplate, setActiveTemplate] = useState("default");
   const [githubId, setGithubId] = useState("vydyas");
@@ -298,6 +299,30 @@ export default function ResumeBuilderPage() {
     };
   }, [showMobilePreview]);
 
+  // Show preview shimmer when styling changes (not initial load)
+  useEffect(() => {
+    if (loading) return; // Don't show preview shimmer during initial load
+    
+    // Set preview loading when styling changes
+    setPreviewLoading(true);
+    
+    // Clear preview loading after a brief delay
+    const timeout = setTimeout(() => {
+      setPreviewLoading(false);
+    }, 300);
+    
+    return () => clearTimeout(timeout);
+  }, [
+    styling.nameColor,
+    styling.headingColor,
+    styling.borderColor,
+    styling.companyColor,
+    styling.resumeBackgroundColor,
+    styling.skillsStyle,
+    styling.headingStyle,
+    styling.headingFont,
+    styling.nameFont,
+  ]);
 
   // Persist to Supabase when data changes (debounced)
   useEffect(() => {
@@ -440,7 +465,7 @@ export default function ResumeBuilderPage() {
   if (loading) {
     return (
       <ErrorBoundary>
-        <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
+        <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50" suppressHydrationWarning>
           <SharedHeader variant="builder" />
           <ResumeBuilderShimmer />
         </div>
@@ -450,7 +475,7 @@ export default function ResumeBuilderPage() {
 
   return (
     <ErrorBoundary>
-      <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
+      <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50" suppressHydrationWarning>
         {/* Name Prompt Modal */}
         <NamePromptModal
           open={showNamePrompt}
@@ -522,15 +547,19 @@ export default function ResumeBuilderPage() {
 
               {/* Resume Preview - Below Controls */}
               <div className="flex-1 flex justify-center flex-col items-center overflow-auto print-resume-wrapper transition-all duration-500">
-                <Resume
-                  key={`${JSON.stringify(userData)}-${styling.nameColor}-${styling.headingColor}-${styling.borderColor}-${styling.companyColor}`}
-                  ref={resumeRef}
-                  template={activeTemplate}
-                  githubId={githubId}
-                  config={config}
-                  userData={userData}
-                  zoom={zoom}
-                />
+                {previewLoading ? (
+                  <ResumeShimmer />
+                ) : (
+                  <Resume
+                    key={`${JSON.stringify(userData)}-${styling.nameColor}-${styling.headingColor}-${styling.borderColor}-${styling.companyColor}`}
+                    ref={resumeRef}
+                    template={activeTemplate}
+                    githubId={githubId}
+                    config={config}
+                    userData={userData}
+                    zoom={zoom}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -581,15 +610,19 @@ export default function ResumeBuilderPage() {
               <div className="flex-1 overflow-auto bg-gray-50 flex items-start justify-center p-2 sm:p-4 md:p-6 print:overflow-visible print:p-0 print:bg-white">
                 <div className="w-full max-w-4xl flex items-center justify-center min-h-full py-3 sm:py-4 md:py-6 print:py-0">
                   <div className="bg-white shadow-lg w-full print:shadow-none print:w-full" style={{ maxWidth: "100%" }}>
-                    <Resume
-                      key={JSON.stringify(userData)}
-                      ref={resumeRef}
-                      template={activeTemplate}
-                      githubId={githubId}
-                      config={config}
-                      userData={userData}
-                      zoom={mobileZoom}
-                    />
+                    {previewLoading ? (
+                      <ResumeShimmer />
+                    ) : (
+                      <Resume
+                        key={JSON.stringify(userData)}
+                        ref={resumeRef}
+                        template={activeTemplate}
+                        githubId={githubId}
+                        config={config}
+                        userData={userData}
+                        zoom={mobileZoom}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

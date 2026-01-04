@@ -22,6 +22,16 @@ import {
 import { DashboardSkeleton } from "@/components/dashboard-skeleton";
 import { CreateResumeNameModal } from "@/components/create-resume-name-modal";
 import { EditResumeNameModal } from "@/components/edit-resume-name-modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Resume {
   id: string;
@@ -39,6 +49,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingResume, setEditingResume] = useState<Resume | null>(null);
+  const [resumeToDelete, setResumeToDelete] = useState<Resume | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("dashboardViewMode");
@@ -190,15 +201,16 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDeleteResume = async (resumeId: string, e: React.MouseEvent) => {
+  const handleDeleteClick = (resume: Resume, e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    if (!confirm("Are you sure you want to delete this resume?")) {
-      return;
-    }
+    setResumeToDelete(resume);
+  };
+
+  const handleDeleteResume = async () => {
+    if (!resumeToDelete) return;
 
     try {
-      const response = await fetch(`/api/resumes/${resumeId}`, {
+      const response = await fetch(`/api/resumes/${resumeToDelete.id}`, {
         method: "DELETE",
       });
 
@@ -208,7 +220,8 @@ export default function DashboardPage() {
       }
 
       // Remove from local state
-      setResumes(resumes.filter((r) => r.id !== resumeId));
+      setResumes(resumes.filter((r) => r.id !== resumeToDelete.id));
+      setResumeToDelete(null);
     } catch (error) {
       console.error("Error deleting resume:", error);
     }
@@ -370,7 +383,7 @@ export default function DashboardPage() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteResume(resume.id, e);
+                              handleDeleteClick(resume, e);
                             }}
                             className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
                           >
@@ -485,7 +498,7 @@ export default function DashboardPage() {
                                 <DropdownMenuItem
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDeleteResume(resume.id, e);
+                                    handleDeleteClick(resume, e);
                                   }}
                                   className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
                                 >
@@ -522,6 +535,27 @@ export default function DashboardPage() {
           onSave={handleEditResumeName}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={!!resumeToDelete} onOpenChange={(open) => !open && setResumeToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Resume</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{resumeToDelete?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteResume}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

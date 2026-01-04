@@ -33,7 +33,7 @@ export function SharedHeader({}: SharedHeaderProps) {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 print:hidden bg-transparent">
+      <nav className="fixed top-0 w-full z-50 print:hidden bg-transparent" suppressHydrationWarning>
         <div className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link 
@@ -46,7 +46,7 @@ export function SharedHeader({}: SharedHeaderProps) {
               </span>
             </Link>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4" suppressHydrationWarning>
               {/* Navigation Links */}
               {isLoaded && !isSignedIn && (
                 <Link
@@ -77,7 +77,7 @@ export function SharedHeader({}: SharedHeaderProps) {
               )}
               
               {/* Auth / user menu */}
-              <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3" suppressHydrationWarning>
               {isLoaded && (
                 <>
                   {!isSignedIn ? (
